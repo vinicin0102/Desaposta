@@ -248,15 +248,13 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 .day p{font-size:15px;color:var(--muted)}
 
 /* ---------- Depoimentos ---------- */
-.quotes{display:grid;grid-auto-flow:column;grid-auto-columns:86%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.quote{scroll-snap-align:start;background:var(--paper);border:1.5px solid var(--ink);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.quote-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.quote-days{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:28px;line-height:1}
-.quote-days small{font-family:var(--f-body);font-size:12px;font-weight:600;color:var(--muted);margin-left:4px}
-.tag-ex{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:1px dashed var(--muted);color:var(--muted);border-radius:999px;padding:4px 8px}
-.quote blockquote{margin:0;font-size:16px;line-height:1.5}
-.quote cite{font-style:normal;font-size:13px;color:var(--muted)}
-.swipe-hint{font-size:13px;color:var(--muted)}
+.tcar{display:flex;align-items:center;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:20px}
+.tcar::-webkit-scrollbar{display:none}
+.tcar figure{flex:0 0 100%;margin:0;scroll-snap-align:center;border-radius:20px;overflow:hidden;border:2px solid var(--ink);background:var(--paper-2);box-shadow:0 5px 0 var(--ink)}
+.tcar img{display:block;width:100%;height:auto}
+.tcar-dots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.tcar-dots button{width:9px;height:9px;padding:0;border:0;border-radius:99px;background:var(--line);cursor:pointer;transition:width .25s,background .25s}
+.tcar-dots button.on{width:26px;background:var(--ink)}
 
 /* ---------- Oferta ---------- */
 .offer{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:24px;box-shadow:0 8px 0 var(--ink);padding:24px 20px;display:flex;flex-direction:column;gap:20px}
@@ -526,21 +524,17 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 
 <!-- =========================================================
      DEPOIMENTOS
-     IMPORTANTE: os textos abaixo são EXEMPLOS de layout.
-     Substitua por depoimentos reais, com autorização, e remova as etiquetas "Exemplo".
+     As imagens vêm de depoimentos/lista.json, gerenciada pelo painel em /admin.
+     Enquanto a lista estiver vazia, esta seção fica escondida.
      ========================================================= -->
-<section class="band">
-  <div class="wrap stack" style="gap:22px">
+<section class="band" id="depoimentos" hidden>
+  <div class="wrap stack" style="gap:20px">
     <div class="stack">
       <p class="eyebrow">Quem já está desapostando</p>
       <h2>Histórias de quem trocou a aposta.</h2>
     </div>
-    <div class="quotes" tabindex="0" aria-label="Depoimentos">
-      <article class="quote"><div class="quote-top"><span class="quote-days">47<small>dias limpos</small></span><span class="tag-ex">Exemplo</span></div><blockquote>“Eu abria o tigrinho no ônibus, no banheiro do trabalho, antes de dormir. Hoje, quando a mão vai no celular, eu abro o desafio do dia.”</blockquote><cite>Nome, idade · Cidade</cite></article>
-      <article class="quote"><div class="quote-top"><span class="quote-days">21<small>dias limpos</small></span><span class="tag-ex">Exemplo</span></div><blockquote>“O cofre mudou minha cabeça. Ver R$ 1.300 guardados em três semanas me fez entender quanto eu jogava fora.”</blockquote><cite>Nome, idade · Cidade</cite></article>
-      <article class="quote"><div class="quote-top"><span class="quote-days">90<small>dias limpos</small></span><span class="tag-ex">Exemplo</span></div><blockquote>“O botão SOS me segurou nas piores noites. Dez minutos parecem pouco, mas é o tempo da vontade passar.”</blockquote><cite>Nome, idade · Cidade</cite></article>
-    </div>
-    <p class="swipe-hint">Arraste para o lado para ver mais.</p>
+    <div class="tcar" id="tcar" tabindex="0" aria-label="Depoimentos" aria-roledescription="carrossel"></div>
+    <div class="tcar-dots" id="tcar-dots"></div>
   </div>
 </section>
 
@@ -688,6 +682,38 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
   document.querySelectorAll(".js-r7").forEach(function(a){
     a.addEventListener("click", function(){ var d = document.getElementById("recompensa"); if (d) d.open = true; });
   });
+
+  /* ---- Carrossel de depoimentos (imagens do painel /admin) ---- */
+  (function(){
+    var sec = document.getElementById("depoimentos"), car = document.getElementById("tcar"), dots = document.getElementById("tcar-dots");
+    if (!sec || !window.fetch) return;
+    fetch("depoimentos/lista.json?v=" + Date.now(), { cache: "no-store" })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var imgs = (d && d.imagens) || [];
+        if (!imgs.length) return;
+        imgs.forEach(function(it, i){
+          var f = document.createElement("figure"), im = document.createElement("img");
+          im.src = it.arquivo; im.alt = "Depoimento " + (i + 1); im.loading = i ? "lazy" : "eager"; im.decoding = "async";
+          if (it.largura && it.altura) { im.width = it.largura; im.height = it.altura; }
+          f.appendChild(im); car.appendChild(f);
+          var b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-label", "Ver depoimento " + (i + 1));
+          b.addEventListener("click", function(){ go(i); hold(); }); dots.appendChild(b);
+        });
+        sec.hidden = false;
+        var n = imgs.length, cur = 0, pausedUntil = 0, visible = false;
+        if (n < 2) dots.hidden = true;
+        function mark(){ Array.prototype.forEach.call(dots.children, function(b, k){ b.classList.toggle("on", k === cur); }); }
+        function go(i){ cur = (i + n) % n; car.scrollTo({ left: car.children[cur].offsetLeft - car.offsetLeft, behavior: "smooth" }); mark(); }
+        function hold(){ pausedUntil = Date.now() + 7000; }
+        car.addEventListener("scroll", function(){ var w = car.clientWidth + 12; var i = Math.round(car.scrollLeft / w); if (i !== cur && i >= 0 && i < n) { cur = i; mark(); } }, { passive: true });
+        ["pointerdown", "touchstart", "wheel", "keydown"].forEach(function(ev){ car.addEventListener(ev, hold, { passive: true }); });
+        if ("IntersectionObserver" in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }, { threshold: 0.3 }).observe(car); else visible = true;
+        mark();
+        if (n > 1) setInterval(function(){ if (visible && !document.hidden && Date.now() > pausedUntil) go(cur + 1); }, 4000);
+      })
+      .catch(function(){});
+  })();
 
   /* ---- Jogo Reflexo ---- */
   (function(){
