@@ -248,13 +248,15 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 .day p{font-size:15px;color:var(--muted)}
 
 /* ---------- Depoimentos ---------- */
-.tcar{display:flex;align-items:center;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:20px}
-.tcar::-webkit-scrollbar{display:none}
-.tcar figure{flex:0 0 100%;margin:0;scroll-snap-align:center;border-radius:20px;overflow:hidden;border:2px solid var(--ink);background:var(--paper-2);box-shadow:0 5px 0 var(--ink)}
-.tcar img{display:block;width:100%;height:auto}
-.tcar-dots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.tcar-dots button{width:9px;height:9px;padding:0;border:0;border-radius:99px;background:var(--line);cursor:pointer;transition:width .25s,background .25s}
-.tcar-dots button.on{width:26px;background:var(--ink)}
+/* esteira de depoimentos: faixa contínua, de ponta a ponta da tela */
+.tmarq{position:relative;overflow:hidden;width:100%;margin-top:24px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.tmarq-track{display:flex;align-items:center;gap:14px;width:max-content;padding-block:4px 12px;animation:tmarq var(--dur,40s) linear infinite;will-change:transform}
+.tmarq.paused .tmarq-track{animation-play-state:paused}
+@media (hover:hover){.tmarq:hover .tmarq-track{animation-play-state:paused}}
+.tmarq figure{flex:none;width:min(76vw,340px);margin:0;border-radius:18px;overflow:hidden;border:2px solid var(--ink);background:var(--paper-2);box-shadow:0 5px 0 var(--ink)}
+.tmarq img{display:block;width:100%;height:auto;-webkit-user-drag:none;user-select:none}
+@keyframes tmarq{from{transform:translateX(0)}to{transform:translateX(calc(-1 * var(--shift,0px)))}}
+@media (prefers-reduced-motion:reduce){.tmarq{overflow-x:auto}}
 
 /* ---------- Oferta ---------- */
 .offer{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:24px;box-shadow:0 8px 0 var(--ink);padding:24px 20px;display:flex;flex-direction:column;gap:20px}
@@ -528,14 +530,11 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
      Enquanto a lista estiver vazia, esta seção fica escondida.
      ========================================================= -->
 <section class="band" id="depoimentos" hidden>
-  <div class="wrap stack" style="gap:20px">
-    <div class="stack">
-      <p class="eyebrow">Quem já está desapostando</p>
-      <h2>Histórias de quem trocou a aposta.</h2>
-    </div>
-    <div class="tcar" id="tcar" tabindex="0" aria-label="Depoimentos" aria-roledescription="carrossel"></div>
-    <div class="tcar-dots" id="tcar-dots"></div>
+  <div class="wrap stack">
+    <p class="eyebrow">Quem já está desapostando</p>
+    <h2>Histórias de quem trocou a aposta.</h2>
   </div>
+  <div class="tmarq" id="tmarq" aria-label="Depoimentos"><div class="tmarq-track" id="tmarq-track"></div></div>
 </section>
 
 <!-- =========================================================
@@ -683,34 +682,39 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     a.addEventListener("click", function(){ var d = document.getElementById("recompensa"); if (d) d.open = true; });
   });
 
-  /* ---- Carrossel de depoimentos (imagens do painel /admin) ---- */
+  /* ---- Esteira de depoimentos (imagens da pasta depoimentos/) ---- */
   (function(){
-    var sec = document.getElementById("depoimentos"), car = document.getElementById("tcar"), dots = document.getElementById("tcar-dots");
+    var sec = document.getElementById("depoimentos"), box = document.getElementById("tmarq"), track = document.getElementById("tmarq-track");
     if (!sec || !window.fetch) return;
+    var SPEED = 45; // pixels por segundo
     fetch("depoimentos/lista.json?v=" + Date.now(), { cache: "no-store" })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
         var imgs = (d && d.imagens) || [];
         if (!imgs.length) return;
-        imgs.forEach(function(it, i){
-          var f = document.createElement("figure"), im = document.createElement("img");
-          im.src = it.arquivo; im.alt = "Depoimento " + (i + 1); im.loading = i ? "lazy" : "eager"; im.decoding = "async";
-          if (it.largura && it.altura) { im.width = it.largura; im.height = it.altura; }
-          f.appendChild(im); car.appendChild(f);
-          var b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-label", "Ver depoimento " + (i + 1));
-          b.addEventListener("click", function(){ go(i); hold(); }); dots.appendChild(b);
-        });
         sec.hidden = false;
-        var n = imgs.length, cur = 0, pausedUntil = 0, visible = false;
-        if (n < 2) dots.hidden = true;
-        function mark(){ Array.prototype.forEach.call(dots.children, function(b, k){ b.classList.toggle("on", k === cur); }); }
-        function go(i){ cur = (i + n) % n; car.scrollTo({ left: car.children[cur].offsetLeft - car.offsetLeft, behavior: "smooth" }); mark(); }
-        function hold(){ pausedUntil = Date.now() + 7000; }
-        car.addEventListener("scroll", function(){ var w = car.clientWidth + 12; var i = Math.round(car.scrollLeft / w); if (i !== cur && i >= 0 && i < n) { cur = i; mark(); } }, { passive: true });
-        ["pointerdown", "touchstart", "wheel", "keydown"].forEach(function(ev){ car.addEventListener(ev, hold, { passive: true }); });
-        if ("IntersectionObserver" in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }, { threshold: 0.3 }).observe(car); else visible = true;
-        mark();
-        if (n > 1) setInterval(function(){ if (visible && !document.hidden && Date.now() > pausedUntil) go(cur + 1); }, 4000);
+        function fig(it, i, copy){
+          var f = document.createElement("figure"), im = document.createElement("img");
+          im.src = it.arquivo; im.alt = copy ? "" : "Depoimento " + (i + 1); im.decoding = "async"; im.draggable = false;
+          if (it.largura && it.altura) { im.width = it.largura; im.height = it.altura; }
+          if (copy) f.setAttribute("aria-hidden", "true");
+          f.appendChild(im); return f;
+        }
+        // um "conjunto" precisa cobrir a tela inteira; repete as imagens até isso acontecer
+        var itemW = Math.min(window.innerWidth * 0.76, 340) + 14, minSet = Math.ceil((box.clientWidth + itemW) / itemW);
+        var set = []; while (set.length < Math.max(minSet, imgs.length)) set = set.concat(imgs);
+        set.forEach(function(it, i){ track.appendChild(fig(it, i % imgs.length, i >= imgs.length)); });
+        set.forEach(function(it, i){ track.appendChild(fig(it, i % imgs.length, true)); }); // cópia para o loop sem emenda
+        function measure(){
+          var first = track.children[0], twin = track.children[set.length];
+          var shift = twin.offsetLeft - first.offsetLeft;
+          track.style.setProperty("--shift", shift + "px");
+          track.style.setProperty("--dur", (shift / SPEED).toFixed(1) + "s");
+        }
+        measure(); window.addEventListener("resize", measure);
+        // segurar o dedo pausa a esteira; soltar continua
+        box.addEventListener("pointerdown", function(){ box.classList.add("paused"); });
+        ["pointerup", "pointercancel", "pointerleave"].forEach(function(ev){ box.addEventListener(ev, function(){ box.classList.remove("paused"); }); });
       })
       .catch(function(){});
   })();
