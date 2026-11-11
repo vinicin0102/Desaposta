@@ -160,15 +160,44 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 .streak{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .streak i{height:8px;border-radius:99px;background:var(--night-card)}
 .streak i.on{background:var(--marker)}
-.reward{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:176px;width:100%;padding:20px;border-radius:18px;border:2px dashed rgba(228,242,74,.55);background:var(--night-card);color:var(--on-night);font:inherit;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
-.reward .r-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-night-muted)}
-.reward .r-main{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:30px;line-height:1.02;text-wrap:balance}
-.reward .r-sub{font-size:14px;color:var(--on-night-muted)}
-.reward.is-open{border-style:solid;border-color:var(--marker);background:var(--marker);color:var(--ink)}
-.reward.is-open .r-kicker,.reward.is-open .r-sub{color:var(--ink);opacity:.75}
-.reward.pop{animation:pop .42s cubic-bezier(.2,1.6,.4,1)}
-@keyframes pop{0%{transform:scale(.94)}100%{transform:scale(1)}}
 .phone-note{font-size:13px;color:var(--on-night-muted);text-align:center}
+
+/* ---------- Jogo Reflexo (jogável) ---------- */
+.game{display:flex;flex-direction:column;gap:10px}
+.game-hud{display:flex;justify-content:space-between;align-items:flex-end}
+.g-lbl{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-night-muted);font-weight:600}
+.g-name{display:block;font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:30px;line-height:1}
+.g-score{text-align:right}
+.g-score b{display:block;font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:38px;line-height:.9;color:var(--marker);font-variant-numeric:tabular-nums;transform-origin:right bottom}
+.g-score b.bump{animation:gbump .2s ease-out}
+@keyframes gbump{from{transform:scale(1.3)}to{transform:scale(1)}}
+.g-time{height:6px;border-radius:99px;background:var(--night-card);overflow:hidden}
+.g-time i{display:block;height:100%;background:linear-gradient(90deg,var(--pine),var(--marker));transform-origin:left}
+.arena{position:relative;height:340px;border-radius:18px;background:var(--night-card) radial-gradient(circle,rgba(255,255,255,.035) 1.5px,transparent 2px) 0 0/22px 22px;overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.arena .tgt{position:absolute;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;border:0;padding:0;background:var(--marker);display:grid;place-items:center;cursor:pointer;box-shadow:0 0 0 7px rgba(228,242,74,.14);animation:tin .18s cubic-bezier(.2,1.6,.4,1) both,tlife var(--life,1200ms) linear forwards;-webkit-tap-highlight-color:transparent}
+.arena .tgt::before{content:"";width:38px;height:38px;border-radius:50%;border:4px solid var(--ink)}
+.arena .tgt::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:var(--ink)}
+@keyframes tin{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes tlife{0%,60%{opacity:1}100%{opacity:.3}}
+.arena .burst{position:absolute;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;border:3px solid var(--marker);pointer-events:none;animation:gburst .4s ease-out forwards}
+@keyframes gburst{from{transform:scale(1);opacity:1}to{transform:scale(2.2);opacity:0}}
+.arena .plus{position:absolute;font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:26px;color:var(--on-night);pointer-events:none;white-space:nowrap;animation:gplus .6s ease-out forwards}
+.arena .plus.hot{color:var(--marker)}
+@keyframes gplus{from{transform:translate(-50%,-80%);opacity:1}to{transform:translate(-50%,-220%);opacity:0}}
+.g-combo{position:absolute;left:50%;top:12px;z-index:3;transform:translateX(-50%) rotate(-3deg);background:var(--marker);color:var(--ink);font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:16px;letter-spacing:.05em;padding:5px 12px;border-radius:999px;pointer-events:none;white-space:nowrap}
+.g-combo.pop{animation:gcpop .3s cubic-bezier(.2,1.6,.4,1)}
+@keyframes gcpop{from{transform:translateX(-50%) rotate(-3deg) scale(.4)}to{transform:translateX(-50%) rotate(-3deg) scale(1)}}
+.g-over{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;background:rgba(16,26,23,.88)}
+.g-over-k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-night-muted);font-weight:600}
+.g-over-t{font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:36px;line-height:1;color:var(--on-night);text-wrap:balance}
+.g-over-s{font-size:14px;color:var(--on-night-muted);line-height:1.4}
+.g-over-s b{color:var(--marker)}
+.g-btn{margin-top:6px;min-height:54px;padding:12px 30px;border-radius:14px;border:2px solid var(--ink);background:var(--marker);color:var(--ink);font-family:var(--f-display);font-stretch:85%;font-weight:900;font-size:21px;box-shadow:0 4px 0 #000;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.g-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+.g-over .btn{min-height:50px;font-size:17px;box-shadow:0 4px 0 #000;margin-top:4px}
+.g-link{background:none;border:0;color:var(--on-night-muted);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer;padding:6px}
+.g-sound{align-self:center;background:none;border:0;color:var(--on-night-muted);font:inherit;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 8px}
+.g-sound svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 .features{display:flex;flex-direction:column}
 .feature{display:grid;grid-template-columns:48px 1fr;gap:14px;padding-block:18px;border-top:1px solid var(--line)}
@@ -386,19 +415,37 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     <div class="stack">
       <p class="eyebrow">Dentro do app</p>
       <h2>Feito pra hora em que a vontade bate.</h2>
-      <p class="lede">Experimente a sensação aqui mesmo. Toque na recompensa do dia:</p>
+      <p class="lede">Sinta aqui mesmo. Este é o desafio Reflexo do app: toque nos alvos antes que sumam e monte combos.</p>
     </div>
 
     <div class="phone">
       <div class="phone-screen">
         <div class="phone-top"><span><b>Dia 4</b> sem apostar</span><span>Nível 2</span></div>
         <div class="streak" aria-label="Sequência: 4 de 7 dias"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
-        <button class="reward" id="reward" type="button" aria-live="polite">
-          <span class="r-kicker">Recompensa do dia</span>
-          <span class="r-main">Toque para abrir</span>
-          <span class="r-sub">Sem custo. Sem risco.</span>
-        </button>
-        <p class="phone-note" id="reward-note">No app, cada recompensa é real e conta pro seu progresso.</p>
+        <div class="game" id="game">
+          <div class="game-hud">
+            <div><span class="g-lbl">Desafio</span><span class="g-name">Reflexo</span></div>
+            <div class="g-score"><span class="g-lbl">Pontos</span><b id="g-score" aria-live="polite">0</b></div>
+          </div>
+          <div class="g-time"><i id="g-time"></i></div>
+          <div class="arena" id="arena">
+            <div class="g-combo" id="g-combo" hidden>COMBO x2</div>
+            <div class="g-over" id="g-start">
+              <p class="g-over-k">15 segundos · sem dinheiro</p>
+              <p class="g-over-t">Toque nos alvos<br>antes que sumam</p>
+              <button class="g-btn" id="g-start-btn" type="button">Começar</button>
+            </div>
+            <div class="g-over" id="g-end" hidden>
+              <p class="g-over-k" id="g-end-k">Tempo!</p>
+              <p class="g-over-t"><span id="g-final">0</span> pontos</p>
+              <p class="g-over-s" id="g-end-s"></p>
+              <a class="btn js-cta" href="#oferta">Quero o app completo</a>
+              <button class="g-link" id="g-again" type="button">Jogar de novo</button>
+            </div>
+          </div>
+          <button class="g-sound" id="g-sound" type="button" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path id="g-sound-wave" d="M16.5 8.5a5 5 0 0 1 0 7"/></svg><span>Som ligado</span></button>
+        </div>
+        <p class="phone-note">No app tem mais jogos, e cada partida vira ponto, nível e medalha.</p>
       </div>
     </div>
 
@@ -581,30 +628,91 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
   }
   range.addEventListener("input", calc); calc();
 
-  /* ---- Recompensa de demonstração ---- */
-  var rewards = [
-    ["Sequência de 4 dias","+40 pontos de progresso"],
-    ["+R$ 60 no cofre","O que você não apostou hoje"],
-    ["Medalha nova","Mão firme: 3 noites sem abrir app de aposta"],
-    ["Combo x3","No desafio de reflexo"],
-    ["Nível 3 desbloqueado","Novos jogos liberados"],
-    ["Missão bônus","10 min de caminhada valem +20 pontos"]
-  ];
-  var btn = document.getElementById("reward"), note = document.getElementById("reward-note"), last = -1, opened = 0;
-  btn.addEventListener("click", function(){
-    var i; do { i = Math.floor(Math.random()*rewards.length); } while (i === last); last = i; opened++;
-    btn.querySelector(".r-kicker").textContent = "Você ganhou";
-    btn.querySelector(".r-main").textContent = rewards[i][0];
-    btn.querySelector(".r-sub").textContent = rewards[i][1];
-    btn.classList.add("is-open"); btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
-    note.textContent = opened > 1 ? "Sentiu? Essa é a faísca, sem perder nada. Toque de novo." : "Toque de novo para abrir outra.";
-  });
+  /* ---- Jogo Reflexo ---- */
+  (function(){
+    var arena = document.getElementById("arena"), scoreEl = document.getElementById("g-score"), timeEl = document.getElementById("g-time"),
+        comboEl = document.getElementById("g-combo"), startOv = document.getElementById("g-start"), endOv = document.getElementById("g-end"),
+        soundBtn = document.getElementById("g-sound");
+    var DURATION = 15000, playing = false, t0 = 0, score = 0, combo = 0, bestCombo = 0, hits = 0, spawnT = 0, raf = 0, actx = null, soundOn = true;
+
+    function audio(){ try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch (e) { actx = null; } return actx; }
+    function tone(f, dur, type, vol, delay){
+      if (!soundOn || !audio()) return;
+      try {
+        var t = actx.currentTime + (delay || 0), o = actx.createOscillator(), g = actx.createGain();
+        o.type = type || "sine"; o.frequency.setValueAtTime(f * 1.9, t); o.frequency.exponentialRampToValueAtTime(f, t + .045);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || .16, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur + .02);
+      } catch (e) {}
+    }
+    function buzz(ms){ try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+    function mult(){ return combo >= 6 ? 3 : combo >= 3 ? 2 : 1; }
+    function fx(cls, x, y, text){ var d = document.createElement("div"); d.className = cls; d.style.left = x + "px"; d.style.top = y + "px"; if (text) d.textContent = text; arena.appendChild(d); setTimeout(function(){ d.remove(); }, 700); return d; }
+
+    function spawn(){
+      if (!playing) return;
+      var w = arena.clientWidth, h = arena.clientHeight, p = Math.min(1, (performance.now() - t0) / DURATION);
+      var life = Math.round(1300 - 550 * p), x, y, tries = 0, others = arena.querySelectorAll(".tgt");
+      do { x = 42 + Math.random() * (w - 84); y = 56 + Math.random() * (h - 98); tries++; }
+      while (tries < 10 && Array.prototype.some.call(others, function(o){ return Math.hypot(o._x - x, o._y - y) < 86; }));
+      var t = document.createElement("button"); t.type = "button"; t.className = "tgt"; t.setAttribute("aria-label", "Alvo");
+      t._x = x; t._y = y; t.style.left = x + "px"; t.style.top = y + "px"; t.style.setProperty("--life", life + "ms");
+      var done = false;
+      t.addEventListener("pointerdown", function(e){ e.preventDefault(); if (done || !playing) return; done = true; clearTimeout(t._k); hit(t, x, y); });
+      t._k = setTimeout(function(){ if (done) return; done = true; t.remove(); miss(); }, life);
+      arena.appendChild(t);
+      spawnT = setTimeout(spawn, Math.round(640 - 280 * p));
+    }
+    function hit(t, x, y){
+      combo++; hits++; bestCombo = Math.max(bestCombo, combo);
+      var m = mult(), pts = 10 * m; score += pts; t.remove();
+      fx("burst", x, y); var pl = fx("plus", x, y, "+" + pts); if (m > 1) pl.classList.add("hot");
+      scoreEl.textContent = score; scoreEl.classList.remove("bump"); void scoreEl.offsetWidth; scoreEl.classList.add("bump");
+      tone(480 * Math.pow(1.07, Math.min(combo, 14)), .15, "sine", .18); buzz(10);
+      if (combo === 3 || combo === 6) {
+        comboEl.textContent = "COMBO x" + m; comboEl.hidden = false; comboEl.classList.remove("pop"); void comboEl.offsetWidth; comboEl.classList.add("pop");
+        tone(1046, .25, "triangle", .12, .05); tone(1318, .3, "triangle", .1, .12);
+      }
+    }
+    function miss(){ combo = 0; comboEl.hidden = true; tone(180, .12, "sine", .06); }
+    function tick(){
+      var left = Math.max(0, 1 - (performance.now() - t0) / DURATION);
+      timeEl.style.transform = "scaleX(" + left + ")";
+      if (left <= 0) return end();
+      raf = requestAnimationFrame(tick);
+    }
+    function clear(){ Array.prototype.forEach.call(arena.querySelectorAll(".tgt"), function(t){ clearTimeout(t._k); t.remove(); }); }
+    function start(){
+      audio(); score = 0; combo = 0; bestCombo = 0; hits = 0; scoreEl.textContent = "0"; comboEl.hidden = true;
+      startOv.hidden = true; endOv.hidden = true; clear(); playing = true; t0 = performance.now();
+      tone(660, .12, "triangle", .1); spawn(); tick();
+    }
+    function end(){
+      playing = false; clearTimeout(spawnT); cancelAnimationFrame(raf); clear(); comboEl.hidden = true;
+      var best = 0; try { best = Number(localStorage.getItem("desaposta-recorde")) || 0; if (score > best) localStorage.setItem("desaposta-recorde", String(score)); } catch (e) {}
+      document.getElementById("g-end-k").textContent = score > best && best > 0 ? "Novo recorde!" : "Tempo!";
+      document.getElementById("g-final").textContent = score;
+      document.getElementById("g-end-s").innerHTML = hits + " acertos · combo de " + bestCombo + "<br>Você gastou <b>R$ 0,00</b> pra sentir isso.";
+      endOv.hidden = false;
+      [523, 659, 784, 1046].forEach(function(f, i){ tone(f, .4, "triangle", .1, i * .07); });
+    }
+    document.getElementById("g-start-btn").addEventListener("click", start);
+    document.getElementById("g-again").addEventListener("click", start);
+    soundBtn.addEventListener("click", function(){
+      soundOn = !soundOn; soundBtn.setAttribute("aria-pressed", String(soundOn));
+      soundBtn.querySelector("span").textContent = soundOn ? "Som ligado" : "Som desligado";
+      document.getElementById("g-sound-wave").style.display = soundOn ? "" : "none";
+    });
+    // pausa se a pessoa sair da aba no meio da partida
+    document.addEventListener("visibilitychange", function(){ if (document.hidden && playing) end(); });
+  })();
 
   /* ---- Barra fixa ---- */
   var sticky = document.getElementById("sticky"), hero = document.getElementById("hero-cta"), offer = document.getElementById("oferta");
   if ("IntersectionObserver" in window) {
-    var heroGone = false, offerIn = false;
-    function upd(){ var on = heroGone && !offerIn; sticky.classList.toggle("show", on); sticky.setAttribute("aria-hidden", on ? "false" : "true"); sticky.querySelector("a").tabIndex = on ? 0 : -1; }
+    var heroGone = false, offerIn = false, gameIn = false;
+    new IntersectionObserver(function(e){ gameIn = e[0].isIntersecting; upd(); }, {threshold:0.05}).observe(document.getElementById("arena"));
+    function upd(){ var on = heroGone && !offerIn && !gameIn; sticky.classList.toggle("show", on); sticky.setAttribute("aria-hidden", on ? "false" : "true"); sticky.querySelector("a").tabIndex = on ? 0 : -1; }
     new IntersectionObserver(function(e){ heroGone = !e[0].isIntersecting && e[0].boundingClientRect.top < 0; upd(); }).observe(hero);
     new IntersectionObserver(function(e){ offerIn = e[0].isIntersecting; upd(); }, {threshold:0.15}).observe(offer);
   }
