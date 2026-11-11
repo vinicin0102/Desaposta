@@ -1,7 +1,9 @@
 {
+  "framework": null,
+  "buildCommand": "node scripts/depoimentos.js",
+  "outputDirectory": "public",
   "cleanUrls": true,
   "headers": [
-    { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     { "source": "/depoimentos/lista.json", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
   ]
 }

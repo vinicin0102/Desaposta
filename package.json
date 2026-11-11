@@ -1,0 +1,10 @@
+{
+  "name": "desaposta-site",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/depoimentos.js"
+  },
+  "dependencies": {
+    "sharp": "0.33.5"
+  }
+}

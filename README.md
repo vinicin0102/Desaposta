@@ -57,3 +57,7 @@ Para mudar as falas do anúncio, edite `video/ad/scenes.js`.
 ```bash
 { printf '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; sed -n '1,/<\/style>/p' src/desaposta.html | grep -v 'claude:viewport'; printf '</head>\n<body>\n'; sed -n '/<\/style>/,$p' src/desaposta.html | tail -n +2; printf '</body>\n</html>\n'; } > index.html
 ```
+
+## Depoimentos (carrossel)
+
+Coloque as imagens na pasta `depoimentos/` pelo próprio GitHub (**Add file → Upload files**). A cada commit, a Vercel roda `scripts/depoimentos.js`, que reduz as imagens e monta o carrossel automático. A ordem segue o nome do arquivo (`1-...`, `2-...`). Sem imagens na pasta, a seção fica escondida.
