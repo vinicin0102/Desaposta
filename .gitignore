@@ -1,0 +1,8 @@
+node_modules/
+.claude/
+# cache da narração (é gerado de novo por video/ad/build-audio.js)
+video/ad/audio/vo/
+video/checkout/shots/
+video/ad/stills/
+.DS_Store
+Thumbs.db

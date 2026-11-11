@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Desaposta · demo do app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat+Brush&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+/* Gravação de tela simulada do app Desaposta. Tudo é desenhado em função do tempo t (render(t)),
+   para gravar quadro a quadro sem travadas. Palco: 540x960 (gravado em 2x = 1080x1920). */
+:root{
+  --night:#101A17; --card:#1C2925; --card2:#24342F; --line:#2E3F39;
+  --text:#E8EEEA; --muted:#93A39C; --marker:#E4F24A; --ink:#13201C;
+  --pine:#1D4D40; --pine2:#245C4C; --loss:#D4483B; --paper:#F1F3EE;
+  --f-display:"Archivo","Arial Narrow",sans-serif;
+  --f-body:"Instrument Sans",system-ui,sans-serif;
+  --f-hand:"Caveat Brush",cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;overflow:hidden}
+body{display:grid;place-items:center;min-height:100vh}
+#stage{position:relative;width:540px;height:960px;overflow:hidden;background:var(--night);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.render body{display:block}
+.scene{position:absolute;inset:0;padding-top:58px;visibility:hidden;will-change:transform,opacity}
+.pad{padding-inline:28px}
+h1,h2,h3,.disp{font-family:var(--f-display);font-stretch:72%;font-weight:900;line-height:.95;letter-spacing:-.01em}
+.tiny{font-size:13px;color:var(--muted);letter-spacing:.02em}
+.label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* status bar */
+.status{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;font-weight:600;font-size:16px;z-index:30;font-variant-numeric:tabular-nums}
+.status .icons{display:flex;gap:7px;align-items:center}
+.status svg{height:13px;fill:var(--text)}
+
+/* splash */
+#s-splash{display:grid;place-items:center;padding-top:0}
+.wm{font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:92px;line-height:1;letter-spacing:-.02em;position:relative}
+.wm b{font-family:var(--f-hand);font-weight:400;font-size:.9em;background:var(--marker);color:var(--ink);padding:0 .12em;border-radius:6px;display:inline-block;transform:rotate(-5deg);margin-right:.04em}
+.splash-sub{margin-top:18px;text-align:center;color:var(--muted);font-size:17px}
+
+/* home */
+.home-head{display:flex;justify-content:space-between;align-items:flex-start;margin-top:14px}
+.home-head h1{font-size:88px}
+.home-head .sub{font-size:20px;font-weight:600;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px;margin-top:8px}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--marker)}
+.streak{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:22px}
+.streak span{height:10px;border-radius:99px;background:var(--card);overflow:hidden}
+.streak span i{display:block;height:100%;background:var(--marker);transform-origin:left;transform:scaleX(0)}
+.streak-cap{margin-top:10px}
+.vcard{margin-top:22px;background:var(--card);border-radius:22px;padding:20px 22px;display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px}
+.vcard b{display:block;font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:50px;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
+.spark{display:flex;align-items:flex-end;gap:5px;height:58px}
+.spark i{width:9px;border-radius:3px;background:var(--pine2)}
+.spark i:last-child{background:var(--marker)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.tile{background:var(--card);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:18px}
+.tile .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--card2)}
+.tile .ic svg{width:20px;height:20px;fill:none;stroke:var(--marker);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tile b{font-family:var(--f-display);font-stretch:82%;font-weight:800;font-size:18px;display:block;line-height:1.05}
+.next{margin-top:14px;background:var(--card);border-radius:20px;padding:18px 22px;display:flex;flex-direction:column;gap:12px}
+.next-top{display:flex;justify-content:space-between;align-items:flex-end}
+.next-top b{display:block;font-family:var(--f-display);font-stretch:80%;font-weight:850;font-size:24px;line-height:1.1;margin-top:4px}
+.next-bar{height:10px;border-radius:99px;background:var(--card2);overflow:hidden}
+.next-bar i{display:block;height:100%;width:71%;background:linear-gradient(90deg,var(--pine2),var(--marker));border-radius:99px}
+.home-head{margin-top:22px!important}
+.sos{position:relative;margin-top:22px;width:100%;border:0;border-radius:24px;background:var(--marker);color:var(--ink);padding:22px 24px;display:flex;align-items:center;justify-content:space-between;font:inherit;text-align:left}
+.sos b{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:30px;line-height:1;display:block}
+.sos small{font-size:15px;font-weight:600;opacity:.75}
+.sos .sos-badge{position:relative;width:64px;height:64px;border-radius:50%;background:var(--ink);color:var(--marker);display:grid;place-items:center;font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:19px;letter-spacing:.04em}
+.sos .ring{position:absolute;inset:0;border-radius:50%;border:3px solid var(--ink)}
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:84px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:12px 18px 0;background:var(--night)}
+.tabbar span{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.tabbar span.on{color:var(--text)}
+.tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tabbar span.on svg{stroke:var(--marker)}
+
+/* notificação */
+#notif{position:absolute;left:14px;right:14px;top:0;z-index:35;background:rgba(48,60,56,.92);backdrop-filter:blur(20px);border-radius:24px;padding:16px 18px;display:grid;grid-template-columns:44px 1fr;gap:14px;box-shadow:0 20px 40px -12px rgba(0,0,0,.6);visibility:hidden}
+#notif .ic{width:44px;height:44px;border-radius:12px;background:var(--loss);display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:22px;color:#fff}
+#notif .hd{display:flex;justify-content:space-between;font-size:13px;color:#B9C5C0;text-transform:uppercase;letter-spacing:.05em}
+#notif p{font-size:16px;line-height:1.35;margin-top:2px}
+
+/* sos */
+#s-sos{background:var(--pine);display:flex;flex-direction:column;align-items:center;text-align:center}
+#s-sos .label{color:#B3C9BF;margin-top:40px}
+#s-sos h2{font-size:58px;margin-top:14px;padding-inline:30px}
+.breath{position:relative;width:300px;height:300px;margin-top:40px;display:grid;place-items:center}
+.breath i{position:absolute;inset:0;border-radius:50%;background:rgba(228,242,74,.10);border:2px solid rgba(228,242,74,.45)}
+.breath i.b2{inset:40px;background:rgba(228,242,74,.14);border-color:rgba(228,242,74,.7)}
+.breath span{position:relative;font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:64px;font-variant-numeric:tabular-nums}
+.breath small{position:absolute;bottom:92px;font-size:15px;color:#C7D8CF}
+.sos-copy{margin-top:34px;font-size:18px;color:#D3E2DA;padding-inline:50px}
+.cta{margin-top:34px;width:calc(100% - 56px);border:2px solid var(--ink);border-radius:20px;background:var(--marker);color:var(--ink);padding:22px;font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:26px;box-shadow:0 6px 0 var(--ink)}
+
+/* jogo */
+.game-head{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px}
+.game-head h2{font-size:54px}
+.score{text-align:right}
+.score b{display:block;font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:64px;line-height:.9;color:var(--marker);font-variant-numeric:tabular-nums;transform-origin:right bottom}
+.timebar{margin:18px 28px 0;height:8px;border-radius:99px;background:var(--card);overflow:hidden}
+.timebar i{display:block;height:100%;background:linear-gradient(90deg,var(--pine2),var(--marker));transform-origin:left}
+.combo{position:absolute;left:50%;top:232px;transform:translateX(-50%);background:var(--marker);color:var(--ink);font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:24px;letter-spacing:.04em;padding:8px 18px;border-radius:999px;opacity:0;white-space:nowrap}
+.tgt{position:absolute;width:108px;height:108px;margin:-54px 0 0 -54px;border-radius:50%;background:var(--marker);display:grid;place-items:center;box-shadow:0 0 0 10px rgba(228,242,74,.12)}
+.tgt::before{content:"";width:62px;height:62px;border-radius:50%;border:5px solid var(--ink)}
+.tgt::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:var(--ink)}
+.burst{position:absolute;width:108px;height:108px;margin:-54px 0 0 -54px;border-radius:50%;border:4px solid var(--marker)}
+.plus{position:absolute;transform:translate(-50%,-50%);font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:36px;color:var(--text);white-space:nowrap}
+.done{position:absolute;left:24px;right:24px;bottom:40px;background:var(--paper);color:var(--ink);border-radius:26px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;opacity:0}
+.done b{font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:40px;line-height:1}
+.done .rec{background:var(--marker);border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font-weight:700;font-size:15px}
+
+/* recompensa */
+#s-reward{display:flex;flex-direction:column;align-items:center;text-align:center}
+#s-reward .label{margin-top:40px}
+#s-reward h2{font-size:52px;margin-top:12px;padding-inline:40px}
+.card3d{position:relative;width:310px;height:410px;margin-top:40px;perspective:1200px}
+.flip{position:absolute;inset:0;transform-style:preserve-3d}
+.face{position:absolute;inset:0;border-radius:28px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.front{background:var(--card);border:3px dashed rgba(228,242,74,.7);overflow:hidden}
+.front .q{font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:170px;line-height:.8;color:var(--marker)}
+.front .shine{position:absolute;inset:-40%;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.10) 50%,transparent 60%)}
+.front small{font-size:16px;color:var(--muted)}
+.back{background:var(--marker);color:var(--ink);transform:rotateY(180deg);border:3px solid var(--ink)}
+.back .label{color:var(--ink);opacity:.7;margin:0}
+.back .lv{font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:110px;line-height:.85}
+.back .nm{font-family:var(--f-hand);font-size:46px;line-height:1}
+.back .pts{margin-top:10px;background:var(--ink);color:var(--marker);border-radius:999px;padding:8px 18px;font-weight:700;font-size:18px}
+.reward-cap{margin-top:30px;font-size:18px;color:var(--muted);padding-inline:60px;opacity:0}
+.cf{position:absolute;left:0;top:0;width:12px;height:18px;border-radius:2px}
+
+/* cofre */
+#s-vault .label{margin-top:30px}
+#s-vault h2{font-size:56px;margin-top:10px}
+.today{margin-top:28px;background:var(--card);border-radius:24px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center}
+.today p{font-size:17px;color:var(--muted);max-width:200px;line-height:1.3}
+.pill{background:var(--marker);color:var(--ink);font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:38px;padding:8px 18px;border-radius:16px;white-space:nowrap}
+.total{margin-top:30px}
+.total b{display:block;font-family:var(--f-display);font-stretch:66%;font-weight:900;font-size:124px;line-height:.9;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:8px}
+.chart{margin-top:26px;height:200px;display:flex;align-items:flex-end;gap:9px;border-bottom:2px solid var(--line);padding-bottom:0}
+.chart i{flex:1;border-radius:6px 6px 0 0;background:var(--pine2);transform-origin:bottom}
+.chart i:last-child{background:var(--marker)}
+.chart-cap{display:flex;justify-content:space-between;margin-top:10px}
+.keep{margin-top:30px;font-family:var(--f-hand);font-size:48px;color:var(--marker);opacity:0}
+
+/* fim */
+#s-end{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:0}
+#s-end .tag{margin-top:34px;font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:54px;line-height:1}
+#s-end .tag span{color:var(--marker)}
+#s-end .tiny{margin-top:22px;font-size:17px}
+
+/* toque */
+#touch,#ripple{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;z-index:40;visibility:hidden}
+#touch{width:64px;height:64px;margin:-32px 0 0 -32px;background:rgba(255,255,255,.30);border:2px solid rgba(255,255,255,.75);box-shadow:0 4px 16px rgba(0,0,0,.35)}
+#ripple{width:64px;height:64px;margin:-32px 0 0 -32px;border:3px solid rgba(255,255,255,.8)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="status"><span id="clock">23:47</span><span class="icons">
+    <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg viewBox="0 0 28 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.5" fill="none" stroke="#E8EEEA" opacity=".5"/><rect x="2.5" y="2.5" width="13" height="8" rx="2"/><rect x="25" y="4" width="2" height="5" rx="1" opacity=".5"/></svg>
+  </span></div>
+
+  <section class="scene" id="s-splash">
+    <div><div class="wm" id="wm1"><b>des</b>aposta</div><p class="splash-sub" id="splash-sub">A mesma faísca. Sem a perda.</p></div>
+  </section>
+
+  <section class="scene" id="s-home">
+    <div class="pad">
+      <div class="home-head">
+        <div><p class="tiny" style="font-size:16px">Boa noite</p><h1>12 dias</h1><p class="sub">sem apostar</p></div>
+        <span class="chip"><i></i>Nível 3</span>
+      </div>
+      <div class="streak" id="streak"><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span><span><i></i></span></div>
+      <p class="tiny streak-cap">Semana 2 · 5 de 7 dias limpos</p>
+      <div class="vcard">
+        <div><p class="label">Cofre</p><b>R$ 1.840</b><p class="tiny" style="margin-top:6px">guardados desde o dia 1</p></div>
+        <div class="spark"><i style="height:22px"></i><i style="height:30px"></i><i style="height:26px"></i><i style="height:38px"></i><i style="height:34px"></i><i style="height:46px"></i><i style="height:58px"></i></div>
+      </div>
+      <div class="tiles">
+        <div class="tile"><span class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><div><b>Reflexo</b><span class="tiny">2 min</span></div></div>
+        <div class="tile"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span><div><b>Combo</b><span class="tiny">3 min</span></div></div>
+        <div class="tile"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M9 8h6M9 12h4"/></svg></span><div><b>Diário</b><span class="tiny">1 min</span></div></div>
+      </div>
+      <div class="next">
+        <div class="next-top"><span><span class="label">Próxima medalha</span><b>Semana limpa</b></span><span class="tiny">faltam 2 dias</span></div>
+        <div class="next-bar"><i></i></div>
+      </div>
+      <button class="sos" id="sos-btn"><div><b>Bateu a vontade?</b><small>Toque aqui antes de abrir a bet</small></div><span class="sos-badge"><span class="ring" id="sos-ring"></span>SOS</span></button>
+    </div>
+    <nav class="tabbar">
+      <span class="on"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9H3z"/></svg>Início</span>
+      <span><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Jogos</span>
+      <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="12" cy="12.5" r="3.5"/></svg>Cofre</span>
+      <span><svg viewBox="0 0 24 24"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M9 8h6M9 12h4"/></svg>Diário</span>
+    </nav>
+  </section>
+
+  <section class="scene" id="s-sos">
+    <p class="label">Modo SOS</p>
+    <h2>A vontade vem em onda. E onda passa.</h2>
+    <div class="breath"><i id="b1"></i><i class="b2" id="b2"></i><span id="sos-timer">10:00</span><small id="breath-txt">inspira</small></div>
+    <p class="sos-copy">Fica comigo 10 minutos. Bora ocupar a cabeça com outra coisa.</p>
+    <button class="cta" id="start-btn">Começar desafio</button>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="pad game-head"><div><p class="label">Desafio</p><h2>Reflexo</h2></div><div class="score"><span class="label">Pontos</span><b id="score">0</b></div></div>
+    <div class="timebar"><i id="timefill"></i></div>
+    <div class="combo" id="combo">COMBO x2</div>
+    <div id="arena"></div>
+    <div class="done" id="done"><div><p class="label" style="color:var(--ink);opacity:.6">Tempo!</p><b><span id="final">240</span> pontos</b></div><span class="rec">Novo recorde</span></div>
+  </section>
+
+  <section class="scene" id="s-reward">
+    <p class="label">Recompensa surpresa</p>
+    <h2>Você segurou a vontade.</h2>
+    <div class="card3d" id="card3d">
+      <div class="flip" id="flip">
+        <div class="face front"><span class="shine" id="shine"></span><span class="q">?</span><small>Toque para abrir</small></div>
+        <div class="face back"><p class="label">Você desbloqueou</p><span class="lv">Nível 4</span><span class="nm">Mão firme</span><span class="pts">+50 pontos</span></div>
+      </div>
+    </div>
+    <p class="reward-cap" id="reward-cap">3 noites seguidas sem abrir app de aposta.</p>
+    <div id="confetti"></div>
+  </section>
+
+  <section class="scene pad" id="s-vault">
+    <p class="label">Cofre Desaposta</p>
+    <h2>Hoje o dinheiro ficou com você.</h2>
+    <div class="today" id="today"><p>Valor que você costumava apostar à noite</p><span class="pill" id="pill">+R$ 150</span></div>
+    <div class="total"><p class="label">Total guardado</p><b id="vtotal">R$ 1.840</b></div>
+    <div class="chart" id="chart"></div>
+    <div class="chart-cap tiny"><span>Dia 1</span><span>Hoje</span></div>
+    <p class="keep" id="keep">Isso fica com você.</p>
+  </section>
+
+  <section class="scene" id="s-end">
+    <div class="wm" id="wm2" style="font-size:104px"><b id="wm2b">des</b>aposta</div>
+    <p class="tag" id="end-tag">A mesma faísca.<br><span>Sem a perda.</span></p>
+    <p class="tiny" id="end-sub">Método Desaposta</p>
+  </section>
+
+  <div id="notif"><span class="ic">$</span><div><div class="hd"><span>Plataforma de apostas</span><span>agora</span></div><p>Seu bônus de R$ 50 expira em 1 hora. Volta pra girar!</p></div></div>
+  <div id="ripple"></div>
+  <div id="touch"></div>
+</div>
+
+<script>
+(function(){
+const DUR = 26;
+const $ = id => document.getElementById(id);
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const eo=x=>1-Math.pow(1-x,3);
+const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const back=x=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const lerp=(a,b,p)=>a+(b-a)*p;
+const brl=n=>"R$ "+Math.round(n).toLocaleString("pt-BR");
+function bump(t,at,w){const d=Math.abs(t-at);return d>w?0:1-d/w}
+
+function scene(el,t,a,b,d){
+  d=d||.35;
+  if(t<a||t>b){el.style.display="none";return false}
+  const i=eo(seg(t,a,a+d)), o=1-eio(seg(t,b-d,b));
+  el.style.display=""; el.style.visibility="visible";
+  el.style.opacity=Math.min(i,o);
+  el.style.transform="translateX("+((1-i)*60-(1-o)*60)+"px)";
+  return true;
+}
+
+/* ---------- linha do tempo ---------- */
+const T = {
+  splash:[0,2.3], home:[2.0,6.65], sos:[6.35,9.15], game:[8.85,16.1], reward:[15.8,19.75], vault:[19.45,23.35], end:[23.05,DUR+1],
+  notifIn:3.0, swipe:[4.25,4.8], sosTap:5.95, startTap:8.55, cardTap:16.85
+};
+
+/* ---------- jogo ---------- */
+const TGT=[[150,400],[385,340],[262,585],[120,720],[402,660],[250,440],[410,505],[140,545],[300,780],[205,330],[385,790]];
+const tapTimes=TGT.map((_,i)=>9.7+i*.5);
+const pts=i=>i<3?10:i<6?20:30;
+const arena=$("arena"); const targets=[];
+TGT.forEach((p,i)=>{
+  const tg=document.createElement("div");tg.className="tgt";tg.style.left=p[0]+"px";tg.style.top=p[1]+"px";
+  const bu=document.createElement("div");bu.className="burst";bu.style.left=p[0]+"px";bu.style.top=p[1]+"px";
+  const pl=document.createElement("div");pl.className="plus";pl.style.left=p[0]+"px";pl.style.top=p[1]+"px";pl.textContent="+"+pts(i);
+  arena.append(tg,bu,pl);targets.push({tg,bu,pl,t:tapTimes[i]});
+});
+const finalScore=TGT.reduce((s,_,i)=>s+pts(i),0); $("final").textContent=finalScore;
+
+/* ---------- confete ---------- */
+let seed=7;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let x=Math.imul(seed^seed>>>15,1|seed);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296};
+const cfColors=["#E4F24A","#FFFFFF","#7FD1A8","#9FB8FF","#E4F24A"];
+const conf=[];const cbox=$("confetti");
+for(let i=0;i<64;i++){
+  const el=document.createElement("i");el.className="cf";el.style.background=cfColors[i%cfColors.length];
+  const a=-Math.PI/2+(rnd()-.5)*2.4, sp=520+rnd()*620;
+  conf.push({el,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,rot:rnd()*360,vr:(rnd()-.5)*900,s:.6+rnd()*.7,d:rnd()*.08});
+  cbox.appendChild(el);
+}
+
+/* ---------- gráfico do cofre ---------- */
+const bars=[34,52,40,66,58,80,72,96,88,110,124,150];const chart=$("chart");
+bars.forEach(()=>chart.appendChild(document.createElement("i")));
+
+/* ---------- toques (posições medidas no layout) ---------- */
+let taps=[];
+function center(el){const r=el.getBoundingClientRect(),s=$("stage").getBoundingClientRect();return[r.left-s.left+r.width/2,r.top-s.top+r.height/2]}
+function measure(){
+  const sos=center($("sos-btn")), start=center($("start-btn")), card=center($("card3d"));
+  taps=[{t:T.sosTap,x:sos[0]+120,y:sos[1]+6},{t:T.startTap,x:start[0]+20,y:start[1]+4}]
+    .concat(TGT.map((p,i)=>({t:tapTimes[i],x:p[0]+6,y:p[1]+8})))
+    .concat([{t:T.cardTap,x:card[0]+20,y:card[1]+40}]);
+  window.__card=card;
+}
+
+function finger(t){
+  const tc=$("touch"), rp=$("ripple");
+  let vis=0,x=0,y=0,sc=1;
+  // arrastar a notificação
+  const [s0,s1]=T.swipe;
+  if(t>=s0-.15&&t<=s1+.15){
+    const p=eio(seg(t,s0,s1)); x=lerp(330,330,p); y=lerp(150,-30,p);
+    vis=Math.min(seg(t,s0-.15,s0),1-seg(t,s1,s1+.15)); sc=.9;
+  }
+  let prev=null,next=null;
+  for(const k of taps){ if(k.t<=t) prev=k; else {next=k;break} }
+  const chained=prev&&next&&next.t-prev.t<=.9;
+  if(chained){
+    const p=eio(seg(t,prev.t+.08,next.t-.05)); x=lerp(prev.x,next.x,p); y=lerp(prev.y,next.y,p); vis=1;
+  }else if(next&&next.t-t<=.5){
+    const p=eo(seg(t,next.t-.5,next.t-.1)); x=lerp(next.x+50,next.x,p); y=lerp(next.y+90,next.y,p); vis=Math.max(vis,seg(t,next.t-.5,next.t-.3));
+  }else if(prev&&t-prev.t<.4){
+    x=prev.x;y=prev.y;vis=Math.max(vis,1-seg(t,prev.t+.15,prev.t+.4));
+  }
+  for(const k of taps){ sc=Math.min(sc,1-.22*bump(t,k.t,.09)); }
+  tc.style.visibility=vis>0?"visible":"hidden"; tc.style.opacity=vis;
+  tc.style.transform="translate("+x+"px,"+y+"px) scale("+sc+")";
+  // onda do último toque
+  if(prev&&t-prev.t<.45){const p=seg(t,prev.t,prev.t+.45);rp.style.visibility="visible";rp.style.opacity=(1-p)*.9;rp.style.transform="translate("+prev.x+"px,"+prev.y+"px) scale("+(1+eo(p)*1.6)+")"}
+  else rp.style.visibility="hidden";
+}
+
+/* ---------- render ---------- */
+function render(t){
+  $("clock").textContent=t<14?"23:47":"23:48";
+
+  // splash
+  if(scene($("s-splash"),t,...T.splash)){
+    const p=seg(t,.15,.7); $("wm1").style.transform="scale("+lerp(.9,1,eo(p))+")"; $("wm1").style.opacity=eo(p);
+    $("wm1").querySelector("b").style.clipPath="inset(0 "+(100-100*eo(seg(t,.6,1.05)))+"% 0 0)";
+    $("splash-sub").style.opacity=seg(t,1.0,1.4);
+  }
+
+  // home
+  if(scene($("s-home"),t,...T.home)){
+    [...$("streak").querySelectorAll("i")].forEach((el,i)=>{el.style.transform="scaleX("+(i<5?eo(seg(t,2.45+i*.12,2.75+i*.12)):0)+")"});
+    const r=((t*1.1)%1); $("sos-ring").style.transform="scale("+(1+r*.45)+")"; $("sos-ring").style.opacity=1-r;
+    $("sos-btn").style.transform="scale("+(1-.04*bump(t,T.sosTap,.12))+")";
+  }
+  // notificação
+  const n=$("notif");
+  if(t>=T.notifIn&&t<=T.swipe[1]+.1){
+    const pin=back(seg(t,T.notifIn,T.notifIn+.5)); const pout=eio(seg(t,T.swipe[0],T.swipe[1]));
+    n.style.visibility="visible"; n.style.opacity=1-pout*.9;
+    n.style.transform="translateY("+(lerp(-140,58,pin)-pout*190)+"px)";
+  } else n.style.visibility="hidden";
+
+  // sos
+  if(scene($("s-sos"),t,...T.sos)){
+    const br=.5+.5*Math.sin((t-6.4)*1.6-Math.PI/2);
+    $("b1").style.transform="scale("+(.82+br*.18)+")"; $("b2").style.transform="scale("+(.8+br*.2)+")";
+    $("breath-txt").textContent=Math.cos((t-6.4)*1.6-Math.PI/2)>0?"inspira":"solta o ar";
+    const left=600-Math.max(0,Math.floor(t-6.7)); $("sos-timer").textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
+    $("start-btn").style.transform="translateY("+(4*bump(t,T.startTap,.12))+"px)";
+    $("start-btn").style.boxShadow="0 "+(6-5*bump(t,T.startTap,.12))+"px 0 var(--ink)";
+  }
+
+  // jogo
+  if(scene($("s-game"),t,...T.game)){
+    let score=0,done=0,lastHit=-9;
+    targets.forEach((o,i)=>{
+      const ta=o.t;
+      const app=seg(t,ta-.42,ta-.22);
+      if(t<ta-.42||t>ta+.65){o.tg.style.visibility="hidden";o.bu.style.visibility="hidden";o.pl.style.visibility="hidden";return}
+      if(t<ta){o.tg.style.visibility="visible";o.tg.style.opacity=1;o.tg.style.transform="scale("+back(app)+")"}
+      else{const p=seg(t,ta,ta+.2);o.tg.style.visibility=p<1?"visible":"hidden";o.tg.style.opacity=1-p;o.tg.style.transform="scale("+(1+.35*p)+")"}
+      if(t>=ta){
+        const p2=seg(t,ta,ta+.4); o.bu.style.visibility=p2<1?"visible":"hidden"; o.bu.style.opacity=1-p2; o.bu.style.transform="scale("+(1+1.3*eo(p2))+")";
+        const p3=seg(t,ta,ta+.65); o.pl.style.visibility="visible"; o.pl.style.opacity=1-seg(t,ta+.4,ta+.65); o.pl.style.transform="translate(-50%,-50%) translateY("+(-20-70*eo(p3))+"px) scale("+lerp(.7,1.1,eo(seg(t,ta,ta+.2)))+")";
+        o.pl.style.color=i>=6?"var(--marker)":"var(--text)";
+      }else{o.bu.style.visibility="hidden";o.pl.style.visibility="hidden"}
+    });
+    tapTimes.forEach((ta,i)=>{if(t>=ta){score+=pts(i);done=i+1;lastHit=ta}});
+    $("score").textContent=score;
+    $("score").style.transform="scale("+(1+.18*Math.max(0,1-(t-lastHit)/.2)*(t>=lastHit?1:0))+")";
+    $("timefill").style.transform="scaleX("+(1-seg(t,9.25,15.15))+")";
+    const cb=$("combo");
+    const c2=tapTimes[3], c3=tapTimes[6];
+    if(t>=c2&&t<15.1){
+      const which=t>=c3?c3:c2; cb.textContent=t>=c3?"COMBO x3":"COMBO x2";
+      cb.style.opacity=1; cb.style.transform="translateX(-50%) scale("+back(seg(t,which,which+.25))+") rotate("+(-3)+"deg)";
+    } else cb.style.opacity=0;
+    const d=$("done"); const pd=seg(t,15.2,15.55);
+    d.style.opacity=pd; d.style.transform="translateY("+(1-back(pd))*80+"px)";
+  }
+
+  // recompensa
+  if(scene($("s-reward"),t,...T.reward)){
+    const ct=T.cardTap;
+    const float=t<ct?Math.sin(t*3)*5:0;
+    const press=1-.05*bump(t,ct,.1);
+    const flipP=eio(seg(t,ct+.05,ct+.55));
+    $("flip").style.transform="translateY("+float+"px) scale("+(press*(1+.06*Math.sin(Math.PI*flipP)))+") rotateY("+(180*flipP)+"deg)";
+    $("shine").style.transform="translateX("+(((t*.7)%1)*160-80)+"%)";
+    $("reward-cap").style.opacity=seg(t,ct+.7,ct+1.0);
+    const c=window.__card||[270,480]; const t0=ct+.4;
+    conf.forEach(o=>{
+      const dt=t-t0-o.d;
+      if(dt<0||dt>2){o.el.style.visibility="hidden";return}
+      const x=c[0]+o.vx*dt, y=c[1]-60+o.vy*dt+.5*1500*dt*dt;
+      o.el.style.visibility="visible"; o.el.style.opacity=1-seg(dt,1.3,2);
+      o.el.style.transform="translate("+x+"px,"+y+"px) rotate("+(o.rot+o.vr*dt)+"deg) scale("+o.s+")";
+    });
+  }
+
+  // cofre
+  if(scene($("s-vault"),t,...T.vault)){
+    const pp=seg(t,19.9,20.25); $("pill").style.transform="scale("+(pp>0?back(pp):0)+") rotate(-3deg)";
+    $("vtotal").textContent=brl(lerp(1840,1990,eo(seg(t,20.4,21.4))));
+    [...chart.children].forEach((el,i)=>{
+      const last=i===bars.length-1;
+      const p=last?back(seg(t,21.0,21.4)):eo(seg(t,19.75+i*.05,20.25+i*.05));
+      el.style.height=bars[i]+"px"; el.style.transform="scaleY("+p+")";
+    });
+    $("keep").style.opacity=seg(t,21.7,22.1);
+    $("keep").style.transform="translateY("+(1-eo(seg(t,21.7,22.1)))*14+"px) rotate(-2deg)";
+  }
+
+  // fim
+  if(scene($("s-end"),t,...T.end)){
+    const p=seg(t,23.15,23.6); $("wm2").style.transform="scale("+lerp(.92,1,eo(p))+")";
+    $("wm2b").style.clipPath="inset(0 "+(100-100*eo(seg(t,23.5,23.95)))+"% 0 0)";
+    $("end-tag").style.opacity=seg(t,24.0,24.4); $("end-tag").style.transform="translateY("+(1-eo(seg(t,24.0,24.4)))*16+"px)";
+    $("end-sub").style.opacity=seg(t,24.5,24.9);
+  }
+
+  finger(t);
+}
+
+window.__DUR=DUR;
+window.__render=render;
+window.__ready=(async()=>{
+  await Promise.all([document.fonts.load('900 40px "Archivo"'),document.fonts.load('400 40px "Caveat Brush"'),document.fonts.load('400 16px "Instrument Sans"'),document.fonts.load('600 16px "Instrument Sans"')]);
+  await document.fonts.ready; measure(); render(0); return true;
+})();
+
+if(!/render=1/.test(location.search)){
+  window.__ready.then(()=>{const st=performance.now();(function loop(){render(((performance.now()-st)/1000)%DUR);requestAnimationFrame(loop)})()});
+}
+})();
+</script>
+</body>
+</html>

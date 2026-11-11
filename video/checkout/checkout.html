@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Desaposta · imagens do checkout</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat+Brush&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+:root{
+  --night:#101A17; --card:#1C2925; --line:#2E3F39; --text:#E8EEEA; --muted:#A3B2AB;
+  --marker:#E4F24A; --ink:#13201C; --pine:#1D4D40; --pine2:#245C4C; --paper:#F1F3EE;
+  --f-display:"Archivo","Arial Narrow",sans-serif; --f-body:"Instrument Sans",system-ui,sans-serif; --f-hand:"Caveat Brush",cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#777;font-family:var(--f-body);color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:flex-start;gap:40px;padding:40px}
+.art{position:relative;overflow:hidden;flex:none}
+.dark{background:radial-gradient(90% 90% at 75% 40%,#22453B 0%,#152822 45%,var(--night) 100%)}
+.disp{font-family:var(--f-display);font-stretch:70%;font-weight:900;line-height:.95;letter-spacing:-.01em}
+.wm{font-family:var(--f-display);font-stretch:70%;font-weight:900;line-height:1;letter-spacing:-.02em;white-space:nowrap}
+.wm b{font-family:var(--f-hand);font-weight:400;font-size:.9em;background:var(--marker);color:var(--ink);padding:0 .12em;border-radius:.06em;display:inline-block;transform:rotate(-5deg);margin-right:.04em}
+.hl{color:var(--marker)}
+.label{font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.rings{position:absolute;border-radius:50%;border:2px solid rgba(228,242,74,.10)}
+.phone{position:absolute;width:var(--w);padding:calc(var(--w)*.035);background:#0A100E;border-radius:calc(var(--w)*.14);box-shadow:0 50px 90px -30px rgba(0,0,0,.75),inset 0 0 0 2px #33443E}
+.phone img{display:block;width:100%;border-radius:calc(var(--w)*.11)}
+.phone::after{content:"";position:absolute;left:50%;top:calc(var(--w)*.06);width:28%;height:calc(var(--w)*.065);transform:translateX(-50%);background:#0A100E;border-radius:99px}
+.chip{display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:999px;padding:12px 22px 12px 14px;font-weight:700;font-size:24px;white-space:nowrap}
+.chip i{width:30px;height:30px;border-radius:50%;background:var(--marker);display:grid;place-items:center;flex:none}
+.chip svg,.trust svg{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chip svg{width:18px;height:18px}
+.trust{display:flex;align-items:center;gap:18px}
+.trust .ic{width:68px;height:68px;border-radius:20px;background:var(--marker);border:2px solid var(--ink);display:grid;place-items:center;flex:none;box-shadow:0 5px 0 rgba(0,0,0,.35)}
+.trust .ic svg{width:34px;height:34px;stroke-width:2.4}
+.trust b{display:block;font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:28px;line-height:1.05}
+.trust span{display:block;font-size:19px;color:var(--muted);margin-top:4px}
+.checks{list-style:none;display:flex;flex-direction:column;gap:16px}
+.checks li{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;font-size:24px;font-weight:600;line-height:1.25}
+.checks li::before{content:"";width:34px;height:34px;border-radius:9px;background:var(--marker) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%2313201C' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/24px no-repeat;border:2px solid var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- 1. CAPA DO PRODUTO 1080x1080 -->
+<div class="art dark" data-out="capa-produto-1080x1080.png" style="width:1080px;height:1080px">
+  <div class="rings" style="width:900px;height:900px;left:420px;top:90px"></div>
+  <div class="rings" style="width:640px;height:640px;left:550px;top:220px"></div>
+  <div class="phone" style="--w:330px;left:690px;top:150px;transform:rotate(9deg)"><img src="shots/games.png"></div>
+  <div class="phone" style="--w:350px;left:500px;top:300px;transform:rotate(-5deg)"><img src="shots/home.png"></div>
+  <div style="position:absolute;left:72px;top:76px">
+    <p class="label">Método</p>
+    <div class="wm" style="font-size:118px;margin-top:6px"><b>des</b>aposta</div>
+  </div>
+  <p class="disp" style="position:absolute;left:72px;top:330px;font-size:92px;width:470px">A mesma faísca.<br><span class="hl">Sem a perda.</span></p>
+  <div style="position:absolute;left:72px;bottom:80px;display:flex;flex-direction:column;align-items:flex-start;gap:14px">
+    <span class="chip"><i><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></i>App no celular</span>
+    <span class="chip"><i><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></i>Programa de 30 dias</span>
+    <span class="chip"><i><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></i>Garantia de 7 dias</span>
+  </div>
+</div>
+
+<!-- 2. BANNER TOPO DESKTOP 1600x400 -->
+<div class="art dark" data-out="banner-topo-1600x400.png" style="width:1600px;height:400px">
+  <div class="rings" style="width:700px;height:700px;left:1150px;top:-120px"></div>
+  <div style="position:absolute;left:70px;top:62px;width:640px">
+    <div class="wm" style="font-size:84px"><b>des</b>aposta</div>
+    <p class="disp" style="font-size:54px;margin-top:26px">Você está a um passo da sua <span class="hl">primeira desaposta.</span></p>
+  </div>
+  <div style="position:absolute;left:780px;top:62px;display:flex;flex-direction:column;gap:26px">
+    <div class="trust"><span class="ic"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><div><b>Acesso imediato</b><span>Login no seu e-mail logo após a compra</span></div></div>
+    <div class="trust"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span><div><b>Garantia de 7 dias</b><span>Não gostou? Devolvemos 100% do valor</span></div></div>
+    <div class="trust"><span class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><b>Compra segura</b><span>Pix ou cartão, dados protegidos</span></div></div>
+  </div>
+  <div class="phone" style="--w:270px;left:1290px;top:40px;transform:rotate(-7deg)"><img src="shots/reward.png"></div>
+</div>
+
+<!-- 3. BANNER TOPO MOBILE 1080x540 -->
+<div class="art dark" data-out="banner-topo-mobile-1080x540.png" style="width:1080px;height:540px">
+  <div class="rings" style="width:620px;height:620px;left:640px;top:-60px"></div>
+  <div class="phone" style="--w:290px;left:745px;top:56px;transform:rotate(-7deg)"><img src="shots/home.png"></div>
+  <div style="position:absolute;left:60px;top:58px;width:640px">
+    <div class="wm" style="font-size:92px"><b>des</b>aposta</div>
+    <p class="disp" style="font-size:66px;margin-top:26px">Falta pouco pra sua <span class="hl">primeira desaposta.</span></p>
+  </div>
+  <div style="position:absolute;left:60px;bottom:52px;display:flex;gap:12px">
+    <span class="chip" style="font-size:22px"><i><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></i>Acesso imediato</span>
+    <span class="chip" style="font-size:22px"><i><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></i>Garantia de 7 dias</span>
+  </div>
+</div>
+
+<!-- 4. BANNER LATERAL 600x1200 -->
+<div class="art dark" data-out="banner-lateral-600x1200.png" style="width:600px;height:1200px">
+  <div class="rings" style="width:640px;height:640px;left:-20px;top:-80px"></div>
+  <div class="phone" style="--w:250px;left:70px;top:70px;transform:rotate(-6deg)"><img src="shots/vault.png"></div>
+  <div class="phone" style="--w:250px;left:290px;top:110px;transform:rotate(6deg)"><img src="shots/reward.png"></div>
+  <div style="position:absolute;left:52px;right:52px;top:640px">
+    <p class="label">O que você recebe</p>
+    <ul class="checks" style="margin-top:22px">
+      <li>Jogos rápidos que dão a faísca, sem dinheiro envolvido</li>
+      <li>Botão SOS pra hora da vontade</li>
+      <li>Cofre com o que ficou com você</li>
+      <li>Sequência de dias, níveis e medalhas</li>
+      <li>Guia de bloqueio e diário de gatilhos</li>
+    </ul>
+  </div>
+  <div style="position:absolute;left:52px;right:52px;bottom:52px;display:flex;align-items:center;gap:18px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:24px;padding:18px 20px">
+    <img src="../../imagens-checkout/selo-garantia-600x600.png" style="width:96px;height:96px;flex:none" alt="">
+    <div><b class="disp" style="font-size:30px;display:block">Garantia de 7 dias</b><span style="font-size:19px;color:var(--muted)">Devolvemos 100% se não for pra você.</span></div>
+  </div>
+</div>
+
+<!-- 5. SELO DE GARANTIA 600x600 (fundo transparente) -->
+<div class="art" data-out="selo-garantia-600x600.png" style="width:600px;height:600px;background:transparent">
+  <svg viewBox="0 0 600 600" width="600" height="600">
+    <defs><path id="arc" d="M300,300 m-218,0 a218,218 0 1,1 436,0 a218,218 0 1,1 -436,0"/></defs>
+    <circle cx="300" cy="300" r="290" fill="#13201C"/>
+    <circle cx="300" cy="300" r="270" fill="#E4F24A"/>
+    <circle cx="300" cy="300" r="250" fill="none" stroke="#13201C" stroke-width="4" stroke-dasharray="10 10"/>
+    <text font-family="Archivo" font-weight="800" font-size="34" letter-spacing="9" fill="#13201C" style="font-stretch:85%"><textPath href="#arc" startOffset="0">GARANTIA INCONDICIONAL • 100% DO VALOR DE VOLTA •</textPath></text>
+    <circle cx="300" cy="300" r="178" fill="#13201C"/>
+    <text x="300" y="352" text-anchor="middle" font-family="Archivo" font-weight="900" font-size="220" fill="#E4F24A" style="font-stretch:68%">7</text>
+    <text x="300" y="412" text-anchor="middle" font-family="Archivo" font-weight="900" font-size="54" letter-spacing="6" fill="#E8EEEA" style="font-stretch:75%">DIAS</text>
+  </svg>
+</div>
+
+</body>
+</html>

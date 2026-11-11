@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#13201C">
+<meta name="description" content="Método Desaposta: app com jogos que dão a mesma faísca da aposta, sem perder dinheiro.">
+<title>Método Desaposta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat+Brush&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+/* Layout: uma coluna de celular (460px máx.). Faixas claras alternam com faixas escuras (madrugada / verde-pinho).
+   Assinatura: a marca é uma correção de revisor — "des" escrito a marca-texto em cima de "aposta". */
+:root{
+  --paper:#F1F3EE;       /* fundo principal, branco esverdeado frio */
+  --paper-2:#E5EBE3;     /* faixa clara alternada */
+  --ink:#13201C;         /* texto e contornos */
+  --muted:#56635E;
+  --line:#CFD7CC;
+  --pine:#1D4D40;        /* faixas de virada (conta, oferta) */
+  --pine-2:#163D33;
+  --on-pine:#EAF0EA;
+  --on-pine-muted:#A8BDB3;
+  --night:#101A17;       /* faixa "madrugada" */
+  --night-card:#1C2925;
+  --on-night:#E6ECE8;
+  --on-night-muted:#93A39C;
+  --marker:#E4F24A;      /* marca-texto: a única cor de destaque */
+  --loss:#D4483B;        /* dinheiro perdido */
+
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-hand:"Caveat Brush","Segoe Print","Comic Sans MS",cursive;
+  --gutter:20px;
+  --col:460px;
+  color-scheme:light;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{max-width:100%}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--marker);outline-offset:3px;border-radius:6px}
+
+.wrap{max-width:var(--col);margin-inline:auto;padding-left:max(var(--gutter),env(safe-area-inset-left,0px));padding-right:max(var(--gutter),env(safe-area-inset-right,0px))}
+.band{padding-block:64px}
+.band--alt{background:var(--paper-2)}
+.band--pine{background:var(--pine);color:var(--on-pine)}
+.band--night{background:var(--night);color:var(--on-night)}
+.stack{display:flex;flex-direction:column;gap:18px}
+
+h1,h2,h3{font-family:var(--f-display);font-stretch:72%;font-weight:850;line-height:.98;letter-spacing:-.005em;margin:0;text-wrap:balance}
+h2{font-size:clamp(34px,10vw,44px)}
+h3{font-size:21px;font-stretch:82%;font-weight:800;line-height:1.1}
+.eyebrow{font-family:var(--f-display);font-stretch:100%;font-weight:700;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.band--pine .eyebrow{color:var(--on-pine-muted)}
+.band--night .eyebrow{color:var(--on-night-muted)}
+.lede{font-size:18px;line-height:1.5}
+.muted{color:var(--muted)}
+.band--pine .muted{color:var(--on-pine-muted)}
+.band--night .muted{color:var(--on-night-muted)}
+.hl{background:linear-gradient(transparent 52%,var(--marker) 52%,var(--marker) 90%,transparent 90%);padding-inline:.08em;color:var(--ink)}
+.band--night .hl,.band--pine .hl{background:none;color:var(--marker)}
+
+/* ---------- Botão ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:62px;padding:14px 20px;background:var(--marker);color:var(--ink);border:2px solid var(--ink);border-radius:14px;box-shadow:0 5px 0 var(--ink);font-family:var(--f-display);font-stretch:85%;font-weight:850;font-size:20px;line-height:1.1;text-align:center;text-decoration:none;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.btn svg{flex:none;width:22px;height:22px}
+.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font-size:13px;color:var(--muted)}
+.trust span{display:inline-flex;align-items:center;gap:6px}
+.trust span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--pine)}
+.band--pine .trust{color:var(--on-pine-muted)}
+.band--pine .trust span::before{background:var(--marker)}
+
+/* ---------- Topo ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:16px}
+.wordmark{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:24px;line-height:1;letter-spacing:-.01em;text-decoration:none}
+.wordmark b{font-family:var(--f-hand);font-weight:400;font-size:.95em;background:var(--marker);padding:0 .12em;margin-right:.04em;border-radius:3px;display:inline-block;transform:rotate(-4deg)}
+.top small{font-size:12px;color:var(--muted);text-align:right;line-height:1.3}
+
+/* ---------- Hero ---------- */
+.hero{padding-block:12px 56px}
+.hero .stack{gap:22px}
+.hero-title{display:flex;flex-direction:column}
+.hero-lead{font-size:clamp(28px,8.4vw,36px);font-weight:800;line-height:1.02}
+.edit{position:relative;display:inline-block;align-self:flex-start;margin-top:.42em;margin-left:.38em;font-size:clamp(76px,24vw,104px);font-weight:900;font-stretch:68%;line-height:.86;letter-spacing:-.02em}
+.edit-ins{position:absolute;left:-.42em;top:-.5em;font-family:var(--f-hand);font-weight:400;font-stretch:100%;font-size:.46em;line-height:1;letter-spacing:0;background:var(--marker);padding:.04em .16em .02em;border-radius:4px;transform:rotate(-7deg);white-space:nowrap;animation:write .55s .35s cubic-bezier(.3,.7,.2,1) both}
+.edit-caret{position:absolute;left:-.19em;bottom:-.04em;width:.28em;height:.22em;overflow:visible}
+.edit-caret path{fill:none;stroke:var(--ink);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;animation:draw .35s .1s ease-out both}
+@keyframes write{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes draw{from{stroke-dashoffset:40}to{stroke-dashoffset:0}}
+
+/* ---------- VSL ---------- */
+.vsl{position:relative;width:100%;max-width:400px;margin-inline:auto;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:var(--night);color:var(--on-night);border:2px solid var(--ink);box-shadow:0 18px 40px -20px rgba(19,32,28,.6)}
+.vsl video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+.vsl-over{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;border:0;background:rgba(16,26,23,.28);font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vsl-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--marker);color:var(--ink);border:2px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);padding:16px 22px;text-align:center;animation:nudge 1.6s ease-in-out infinite}
+.vsl-card small{font-size:13px;font-weight:600;opacity:.8}
+.vsl-card strong{font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:26px;line-height:1}
+.vsl-card svg{width:34px;height:34px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@keyframes nudge{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.vsl-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:rgba(16,26,23,.82);text-align:center}
+.vsl-end p{font-family:var(--f-display);font-stretch:78%;font-weight:900;font-size:28px;line-height:1.05;color:var(--on-night)}
+.vsl-end .btn{max-width:300px}
+.vsl-end button{background:none;border:0;color:var(--on-night-muted);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer}
+.vsl-pause{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:rgba(16,26,23,.7);display:grid;place-items:center;pointer-events:none}
+.vsl-pause svg{width:28px;height:28px;fill:var(--marker);margin-left:4px}
+.vsl-bar{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,.18)}
+.vsl-bar i{display:block;height:100%;width:0;background:var(--marker)}
+
+/* ---------- Madrugada ---------- */
+.notifs{display:flex;flex-direction:column;gap:10px}
+.notif{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;background:var(--night-card);border-radius:18px;padding:12px 14px}
+.notif-ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:14px;color:var(--on-night)}
+.ico-bet{background:var(--loss)}
+.ico-bank{background:#3B5A86}
+.ico-note{background:#3A4642}
+.ico-msg{background:#2F7A55}
+.notif-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--on-night-muted)}
+.notif-head time{font-variant-numeric:tabular-nums;letter-spacing:0}
+.notif-body{min-width:0;font-size:15px;line-height:1.4}
+.notif--last{outline:1.5px solid var(--loss)}
+.notif--last .notif-body{font-weight:600}
+
+/* ---------- Comparativo ---------- */
+.compare{border:2px solid var(--ink);border-radius:18px;overflow:hidden;background:var(--paper)}
+.compare-head,.compare-row div.cells{display:grid;grid-template-columns:1fr 1fr}
+.compare-head div{padding:12px 14px;font-family:var(--f-display);font-stretch:85%;font-weight:850;font-size:17px}
+.compare-head div:first-child{background:var(--ink);color:var(--paper)}
+.compare-head div:last-child{background:var(--marker)}
+.compare-row{border-top:1px solid var(--line)}
+.compare-row .label{padding:10px 14px 0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.compare-row .cells div{padding:4px 14px 12px;font-size:15px;line-height:1.35}
+.compare-row .cells div:first-child{color:var(--muted)}
+.compare-row .cells div:last-child{font-weight:600;border-left:1px solid var(--line)}
+
+/* ---------- Calculadora ---------- */
+.calc{background:var(--pine-2);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.calc label{font-weight:600;font-size:16px}
+.calc-week{font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:44px;line-height:1;color:var(--marker);font-variant-numeric:tabular-nums}
+.calc-week small{font-family:var(--f-body);font-size:15px;font-weight:500;color:var(--on-pine-muted);margin-left:6px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(to right,var(--marker) var(--p,15%),rgba(255,255,255,.18) var(--p,15%))}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:rgba(255,255,255,.18)}
+input[type=range]::-moz-range-progress{height:8px;border-radius:99px;background:var(--marker)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-11px;border-radius:50%;background:var(--marker);border:3px solid var(--ink);box-shadow:0 2px 0 var(--ink)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--marker);border:3px solid var(--ink)}
+.calc-scale{display:flex;justify-content:space-between;font-size:12px;color:var(--on-pine-muted);margin-top:-8px;font-variant-numeric:tabular-nums}
+.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.calc-cell{background:var(--pine);border-radius:14px;padding:12px 14px;min-width:0}
+.calc-cell span{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--on-pine-muted)}
+.calc-cell output{display:block;font-family:var(--f-display);font-stretch:75%;font-weight:850;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.calc-cell--big{grid-column:1/-1;background:var(--paper);color:var(--ink)}
+.calc-cell--big span{color:var(--muted)}
+.calc-cell--big output{font-size:clamp(46px,14vw,58px);font-stretch:68%;font-weight:900;color:var(--loss)}
+
+/* ---------- App / recompensa ---------- */
+.phone{background:var(--ink);color:var(--on-night);border-radius:30px;padding:10px;box-shadow:0 18px 40px -18px rgba(19,32,28,.55)}
+.phone-screen{background:var(--night);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.phone-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--on-night-muted)}
+.phone-top b{font-family:var(--f-display);font-stretch:80%;font-weight:850;font-size:18px;color:var(--on-night)}
+.streak{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.streak i{height:8px;border-radius:99px;background:var(--night-card)}
+.streak i.on{background:var(--marker)}
+.reward{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:176px;width:100%;padding:20px;border-radius:18px;border:2px dashed rgba(228,242,74,.55);background:var(--night-card);color:var(--on-night);font:inherit;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+.reward .r-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-night-muted)}
+.reward .r-main{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:30px;line-height:1.02;text-wrap:balance}
+.reward .r-sub{font-size:14px;color:var(--on-night-muted)}
+.reward.is-open{border-style:solid;border-color:var(--marker);background:var(--marker);color:var(--ink)}
+.reward.is-open .r-kicker,.reward.is-open .r-sub{color:var(--ink);opacity:.75}
+.reward.pop{animation:pop .42s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(.94)}100%{transform:scale(1)}}
+.phone-note{font-size:13px;color:var(--on-night-muted);text-align:center}
+
+.features{display:flex;flex-direction:column}
+.feature{display:grid;grid-template-columns:48px 1fr;gap:14px;padding-block:18px;border-top:1px solid var(--line)}
+.feature:last-child{border-bottom:1px solid var(--line)}
+.feature-ico{width:48px;height:48px;border-radius:13px;background:var(--paper-2);border:1.5px solid var(--ink);display:grid;place-items:center}
+.feature-ico svg{width:24px;height:24px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.feature div{min-width:0;display:flex;flex-direction:column;gap:4px}
+.feature p{font-size:15px;color:var(--muted)}
+
+/* ---------- 30 dias ---------- */
+.days{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;position:relative}
+.days::before{content:"";position:absolute;left:31px;top:12px;bottom:12px;width:2px;background:var(--ink)}
+.day{display:grid;grid-template-columns:64px 1fr;gap:14px;padding-block:12px;position:relative}
+.day-n{justify-self:center;position:relative;z-index:1;width:64px;background:var(--paper-2);text-align:center;font-family:var(--f-display);font-stretch:72%;font-weight:900;line-height:.9;padding-block:2px}
+.day-n small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-stretch:100%;font-weight:700;color:var(--muted)}
+.day-n span{font-size:36px}
+.day:last-child .day-n span{background:var(--marker);padding-inline:.12em;border-radius:4px}
+.day div:last-child{min-width:0;display:flex;flex-direction:column;gap:3px;padding-top:2px}
+.day p{font-size:15px;color:var(--muted)}
+
+/* ---------- Depoimentos ---------- */
+.quotes{display:grid;grid-auto-flow:column;grid-auto-columns:86%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.quote{scroll-snap-align:start;background:var(--paper);border:1.5px solid var(--ink);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.quote-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.quote-days{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:28px;line-height:1}
+.quote-days small{font-family:var(--f-body);font-size:12px;font-weight:600;color:var(--muted);margin-left:4px}
+.tag-ex{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:1px dashed var(--muted);color:var(--muted);border-radius:999px;padding:4px 8px}
+.quote blockquote{margin:0;font-size:16px;line-height:1.5}
+.quote cite{font-style:normal;font-size:13px;color:var(--muted)}
+.swipe-hint{font-size:13px;color:var(--muted)}
+
+/* ---------- Oferta ---------- */
+.offer{background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:24px;box-shadow:0 8px 0 var(--ink);padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+.offer h3{font-size:28px;font-stretch:72%;font-weight:900}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:10px;font-size:15px;line-height:1.4}
+.checks li::before{content:"";width:22px;height:22px;border-radius:6px;background:var(--marker) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%2313201C' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;border:1.5px solid var(--ink)}
+.offer .trust span::before{background:var(--pine)}
+.price{display:flex;align-items:flex-end;gap:12px;padding-top:18px;border-top:1.5px dashed var(--line)}
+.price-num{font-family:var(--f-display);font-stretch:68%;font-weight:900;font-size:72px;line-height:.82;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.price-num sup{font-size:.36em;vertical-align:top;margin-right:3px;position:relative;top:.12em}
+.price-meta{font-size:14px;color:var(--muted);line-height:1.35;padding-bottom:2px}
+.price-meta b{display:block;color:var(--ink)}
+.guarantee{display:grid;grid-template-columns:84px 1fr;gap:16px;align-items:center}
+.seal{width:84px;height:84px;border-radius:50%;border:2px dashed var(--marker);display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-stretch:72%;font-weight:900;line-height:.9;color:var(--marker)}
+.seal span{font-size:34px;display:block}
+.seal small{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-stretch:100%;font-weight:700}
+.guarantee div:last-child{min-width:0;display:flex;flex-direction:column;gap:4px}
+.guarantee p{font-size:15px;color:var(--on-pine-muted)}
+
+/* ---------- FAQ ---------- */
+.faq{display:flex;flex-direction:column}
+.faq details{border-top:1.5px solid var(--ink)}
+.faq details:last-child{border-bottom:1.5px solid var(--ink)}
+.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr 28px;gap:12px;align-items:center;padding-block:18px;font-family:var(--f-display);font-stretch:85%;font-weight:800;font-size:19px;line-height:1.15}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";width:28px;height:28px;border-radius:50%;border:1.5px solid var(--ink);background:
+  linear-gradient(var(--ink),var(--ink)) center/12px 2px no-repeat,
+  linear-gradient(var(--ink),var(--ink)) center/2px 12px no-repeat;transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg);background-color:var(--marker)}
+.faq details p{padding-bottom:18px;color:var(--muted);font-size:15px}
+
+/* ---------- Rodapé ---------- */
+.help{background:var(--night-card);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.help strong{font-family:var(--f-display);font-stretch:85%;font-weight:850;font-size:19px;color:var(--on-night)}
+.help p{font-size:15px;color:var(--on-night-muted)}
+.help .num{color:var(--marker);font-weight:700;user-select:all}
+.foot-links{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--on-night-muted)}
+.foot-links a{color:var(--on-night-muted)}
+.fine{font-size:12px;line-height:1.5;color:var(--on-night-muted)}
+.footer{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+
+/* ---------- Barra fixa ---------- */
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--ink);color:var(--on-night);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateY(110%);transition:transform .28s ease;box-shadow:0 -10px 30px -12px rgba(0,0,0,.45)}
+.sticky.show{transform:none}
+.sticky .wrap{display:flex;align-items:center;gap:14px}
+.sticky-price{flex:none;line-height:1.1;font-size:12px;color:var(--on-night-muted)}
+.sticky-price b{display:block;font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:26px;color:var(--on-night)}
+.sticky .btn{min-height:52px;font-size:18px;box-shadow:none;border-color:var(--marker)}
+
+@media (min-width:700px){
+  .band{padding-block:84px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     TOPO + HERO
+     ========================================================= -->
+<header class="wrap top">
+  <a class="wordmark" href="#topo" aria-label="Método Desaposta"><b>des</b>aposta</a>
+  <small>Programa no celular<br>para parar de apostar</small>
+</header>
+
+<main id="topo">
+<section class="hero">
+  <div class="wrap stack">
+    <p class="eyebrow">Para quem quer parar com tigrinho, roleta e bets</p>
+
+    <h1 class="hero-title">
+      <span class="hero-lead">Troque a próxima aposta por uma</span>
+      <span class="edit" aria-label="desaposta."><span class="edit-ins" aria-hidden="true">des</span><svg class="edit-caret" viewBox="0 0 26 20" aria-hidden="true"><path d="M2 18 L13 3 L24 18"/></svg><span aria-hidden="true">aposta.</span></span>
+    </h1>
+
+    <!-- =====================================================
+         MINI VSL (vsl.mp4 + vsl-poster.jpg na mesma pasta desta página)
+         Começa sem som e em loop; ao tocar, recomeça do início com som.
+         Para usar um player externo (vturb, Panda), troque o <video> pelo embed dele.
+         ===================================================== -->
+    <div class="vsl" id="vsl">
+      <video id="vsl-video" src="vsl.mp4" poster="vsl-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Vídeo de apresentação do Método Desaposta"></video>
+      <button class="vsl-over" id="vsl-unmute" type="button">
+        <span class="vsl-card">
+          <small>Seu vídeo já começou</small>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>
+          <strong>Toque para ouvir</strong>
+        </span>
+      </button>
+      <div class="vsl-pause" id="vsl-pause" hidden><svg viewBox="0 0 24 24"><path d="M6 3.5v17l14-8.5z"/></svg></div>
+      <div class="vsl-end" id="vsl-end" hidden>
+        <p>Pronto pra trocar a aposta por uma <span style="color:var(--marker)">desaposta</span>?</p>
+        <a class="btn js-cta" href="#oferta">Quero começar agora</a>
+        <button type="button" id="vsl-replay">Assistir de novo</button>
+      </div>
+      <div class="vsl-bar" aria-hidden="true"><i id="vsl-progress"></i></div>
+    </div>
+
+    <a class="btn js-cta" id="hero-cta" href="#oferta">Quero começar a desapostar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <div class="trust"><span>Acesso na hora</span><span>Garantia de 7 dias</span><span>Pagamento seguro</span></div>
+    <p class="lede">Jogos rápidos que dão a mesma faísca da aposta. A diferença: aqui <span class="hl">cada vitória fica com você</span>, em dias limpos e dinheiro guardado.</p>
+  </div>
+</section>
+
+<!-- =========================================================
+     MADRUGADA (identificação)
+     ========================================================= -->
+<section class="band band--night">
+  <div class="wrap stack" style="gap:28px">
+    <div class="stack">
+      <p class="eyebrow">Reconhece essa noite?</p>
+      <h2>Se essa é a sua madrugada, você não está sozinho.</h2>
+    </div>
+
+    <div class="notifs" role="list">
+      <div class="notif" role="listitem"><span class="notif-ico ico-bet" aria-hidden="true">$</span><div class="notif-body"><div class="notif-head"><span>Plataforma de apostas</span><time>23:58</time></div>Seu bônus de R$ 50 expira em 1 hora. Volta pra girar!</div></div>
+      <div class="notif" role="listitem"><span class="notif-ico ico-bank" aria-hidden="true">B</span><div class="notif-body"><div class="notif-head"><span>Banco</span><time>00:41</time></div>Pix de R$ 200,00 enviado.</div></div>
+      <div class="notif" role="listitem"><span class="notif-ico ico-note" aria-hidden="true">N</span><div class="notif-body"><div class="notif-head"><span>Notas</span><time>01:15</time></div>Só mais uma rodada pra recuperar o que eu perdi. Depois eu paro.</div></div>
+      <div class="notif" role="listitem"><span class="notif-ico ico-bank" aria-hidden="true">B</span><div class="notif-body"><div class="notif-head"><span>Banco</span><time>02:47</time></div>Pix de R$ 150,00 enviado.</div></div>
+      <div class="notif" role="listitem"><span class="notif-ico ico-msg" aria-hidden="true">M</span><div class="notif-body"><div class="notif-head"><span>Mensagem</span><time>03:12</time></div>Ainda acordado? Tá tudo bem?</div></div>
+      <div class="notif notif--last" role="listitem"><span class="notif-ico ico-bank" aria-hidden="true">B</span><div class="notif-body"><div class="notif-head"><span>Banco</span><time>03:41</time></div>Saldo disponível: R$ 12,40</div></div>
+    </div>
+
+    <p class="lede">Isso não é falta de caráter. Plataformas de aposta são desenhadas para prender: a recompensa incerta solta dopamina, e o cérebro aprende a correr atrás dela. <span class="hl">Força de vontade sozinha perde pra esse desenho.</span></p>
+  </div>
+</section>
+
+<!-- =========================================================
+     MECANISMO
+     ========================================================= -->
+<section class="band">
+  <div class="wrap stack" style="gap:28px">
+    <div class="stack">
+      <p class="eyebrow">Como o método funciona</p>
+      <h2>A mesma faísca. Sem a perda.</h2>
+      <p class="lede">O que vicia não é o prêmio. É a expectativa do “e se agora vier?”. O Método Desaposta usa essa mesma lógica a seu favor: jogos curtos, recompensas surpresa e metas diárias. A emoção continua, só que agora cada rodada te deixa mais perto de parar.</p>
+    </div>
+
+    <div class="compare" role="table" aria-label="Aposta comparada ao Desaposta">
+      <div class="compare-head" role="row"><div role="columnheader">Na aposta</div><div role="columnheader">No Desaposta</div></div>
+      <div class="compare-row" role="rowgroup"><p class="label">Recompensa surpresa</p><div class="cells" role="row"><div role="cell">Sim, e você paga por cada tentativa</div><div role="cell">Sim, e não custa nada</div></div></div>
+      <div class="compare-row" role="rowgroup"><p class="label">Custo de cada rodada</p><div class="cells" role="row"><div role="cell">De R$ 1 a R$ 100 ou mais</div><div role="cell">R$ 0</div></div></div>
+      <div class="compare-row" role="rowgroup"><p class="label">O que você leva</p><div class="cells" role="row"><div role="cell">Quase sempre, prejuízo</div><div role="cell">Pontos, níveis e dias limpos</div></div></div>
+      <div class="compare-row" role="rowgroup"><p class="label">No fim do mês</p><div class="cells" role="row"><div role="cell">O dinheiro foi embora</div><div role="cell">O dinheiro está no seu cofre</div></div></div>
+      <div class="compare-row" role="rowgroup"><p class="label">Às 3 da manhã</p><div class="cells" role="row"><div role="cell">“Só mais uma”</div><div role="cell">Botão SOS da vontade</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     CALCULADORA
+     ========================================================= -->
+<section class="band band--pine">
+  <div class="wrap stack" style="gap:26px">
+    <div class="stack">
+      <p class="eyebrow">Faça a conta</p>
+      <h2>Quanto a aposta está levando de você?</h2>
+    </div>
+
+    <div class="calc">
+      <label for="calc-range">Quanto você coloca nas apostas por semana?</label>
+      <div class="calc-week" aria-live="polite"><span id="calc-week">R$ 150</span><small>por semana</small></div>
+      <input type="range" id="calc-range" min="20" max="1000" step="10" value="150" aria-describedby="calc-week">
+      <div class="calc-scale" aria-hidden="true"><span>R$ 20</span><span>R$ 1.000</span></div>
+      <div class="calc-out">
+        <div class="calc-cell calc-cell--big"><span>Em 1 ano</span><output id="calc-year" for="calc-range">R$ 7.800</output></div>
+        <div class="calc-cell"><span>Por mês</span><output id="calc-month" for="calc-range">R$ 650</output></div>
+        <div class="calc-cell"><span>Em 5 anos</span><output id="calc-5y" for="calc-range">R$ 39.000</output></div>
+      </div>
+      <p class="muted" style="font-size:15px">Isso dá <strong id="calc-market" style="color:var(--on-pine)">9 meses</strong> de compras de mercado (R$ 800 por mês).</p>
+    </div>
+
+    <p class="lede">No Cofre do Desaposta, cada real que você deixa de apostar fica registrado. <span class="hl">Você vê o número subir em vez de sumir.</span></p>
+  </div>
+</section>
+
+<!-- =========================================================
+     O APP
+     ========================================================= -->
+<section class="band">
+  <div class="wrap stack" style="gap:30px">
+    <div class="stack">
+      <p class="eyebrow">Dentro do app</p>
+      <h2>Feito pra hora em que a vontade bate.</h2>
+      <p class="lede">Experimente a sensação aqui mesmo. Toque na recompensa do dia:</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="phone-top"><span><b>Dia 4</b> sem apostar</span><span>Nível 2</span></div>
+        <div class="streak" aria-label="Sequência: 4 de 7 dias"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+        <button class="reward" id="reward" type="button" aria-live="polite">
+          <span class="r-kicker">Recompensa do dia</span>
+          <span class="r-main">Toque para abrir</span>
+          <span class="r-sub">Sem custo. Sem risco.</span>
+        </button>
+        <p class="phone-note" id="reward-note">No app, cada recompensa é real e conta pro seu progresso.</p>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><div><h3>Jogos de 2 minutos</h3><p>Desafios de reflexo, quebra-cabeças e combos com recompensa surpresa. Nenhum envolve dinheiro.</p></div></div>
+      <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m5.6 5.6 3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></svg></span><div><h3>Botão SOS da vontade</h3><p>Quando bater a fissura, um desafio guiado de 10 minutos ocupa sua cabeça até a onda passar.</p></div></div>
+      <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5V7M7 20v1.5M17 20v1.5"/></svg></span><div><h3>Cofre Desaposta</h3><p>Registre quanto deixou de apostar e acompanhe o total crescer, dia após dia.</p></div></div>
+      <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><path d="M4 20V15M10 20v-8M16 20V8M22 20V3"/></svg></span><div><h3>Sequência e níveis</h3><p>Cada dia limpo vira ponto, medalha e nível novo. Seu progresso fica à vista.</p></div></div>
+      <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span><div><h3>Guia de bloqueio</h3><p>Passo a passo para bloquear sites e apps de aposta no seu celular.</p></div></div>
+      <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12M9 7h6M9 11h4"/></svg></span><div><h3>Diário de gatilhos</h3><p>Anote o que veio antes da vontade e descubra seus horários e situações de risco.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     PRIMEIROS 30 DIAS
+     ========================================================= -->
+<section class="band band--alt">
+  <div class="wrap stack" style="gap:26px">
+    <div class="stack">
+      <p class="eyebrow">O caminho</p>
+      <h2>Seus primeiros 30 dias com o método.</h2>
+    </div>
+    <ol class="days">
+      <li class="day"><span class="day-n"><small>Dia</small><span>1</span></span><div><h3>Você monta sua base</h3><p>Configura o cofre, segue o guia de bloqueio e joga a primeira partida.</p></div></li>
+      <li class="day"><span class="day-n"><small>Dia</small><span>3</span></span><div><h3>A vontade aperta</h3><p>Pra muita gente, é aqui que fica difícil. O botão SOS fica a um toque.</p></div></li>
+      <li class="day"><span class="day-n"><small>Dia</small><span>7</span></span><div><h3>Primeira semana limpa</h3><p>Sua primeira medalha e o primeiro total no cofre.</p></div></li>
+      <li class="day"><span class="day-n"><small>Dia</small><span>14</span></span><div><h3>Você conhece seus gatilhos</h3><p>O diário mostra os horários e situações em que a vontade é mais forte.</p></div></li>
+      <li class="day"><span class="day-n"><small>Dia</small><span>30</span></span><div><h3>Um mês no cofre</h3><p>Você vê, em reais, quanto ficou com você em vez de ir pra plataforma.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- =========================================================
+     DEPOIMENTOS
+     IMPORTANTE: os textos abaixo são EXEMPLOS de layout.
+     Substitua por depoimentos reais, com autorização, e remova as etiquetas "Exemplo".
+     ========================================================= -->
+<section class="band">
+  <div class="wrap stack" style="gap:22px">
+    <div class="stack">
+      <p class="eyebrow">Quem já está desapostando</p>
+      <h2>Histórias de quem trocou a aposta.</h2>
+    </div>
+    <div class="quotes" tabindex="0" aria-label="Depoimentos">
+      <article class="quote"><div class="quote-top"><span class="quote-days">47<small>dias limpos</small></span><span class="tag-ex">Exemplo</span></div><blockquote>“Eu abria o tigrinho no ônibus, no banheiro do trabalho, antes de dormir. Hoje, quando a mão vai no celular, eu abro o desafio do dia.”</blockquote><cite>Nome, idade · Cidade</cite></article>
+      <article class="quote"><div class="quote-top"><span class="quote-days">21<small>dias limpos</small></span><span class="tag-ex">Exemplo</span></div><blockquote>“O cofre mudou minha cabeça. Ver R$ 1.300 guardados em três semanas me fez entender quanto eu jogava fora.”</blockquote><cite>Nome, idade · Cidade</cite></article>
+      <article class="quote"><div class="quote-top"><span class="quote-days">90<small>dias limpos</small></span><span class="tag-ex">Exemplo</span></div><blockquote>“O botão SOS me segurou nas piores noites. Dez minutos parecem pouco, mas é o tempo da vontade passar.”</blockquote><cite>Nome, idade · Cidade</cite></article>
+    </div>
+    <p class="swipe-hint">Arraste para o lado para ver mais.</p>
+  </div>
+</section>
+
+<!-- =========================================================
+     OFERTA  (edite preço e itens aqui)
+     ========================================================= -->
+<section class="band band--pine" id="oferta">
+  <div class="wrap stack" style="gap:30px">
+    <div class="stack">
+      <p class="eyebrow">Acesso completo</p>
+      <h2>Comece hoje. Seu cofre começa a contar amanhã.</h2>
+    </div>
+
+    <div class="offer">
+      <div class="stack" style="gap:6px">
+        <p class="eyebrow">Método Desaposta</p>
+        <h3>App completo + programa de 30 dias</h3>
+      </div>
+      <ul class="checks">
+        <li>Jogos de recompensa rápida, sem dinheiro envolvido</li>
+        <li>Botão SOS para os momentos de fissura</li>
+        <li>Cofre Desaposta com seu total guardado</li>
+        <li>Sequência de dias, níveis e medalhas</li>
+        <li>Guia de bloqueio de sites e apps de aposta</li>
+        <li>Diário de gatilhos com seus padrões</li>
+      </ul>
+      <div class="price">
+        <span class="price-num"><sup>R$</sup>37</span>
+        <span class="price-meta"><b>Pagamento único</b>Menos do que muita gente perde em 5 minutos de aposta.</span>
+      </div>
+      <a class="btn js-cta js-checkout" href="#oferta">Quero meu acesso <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <div class="trust" style="color:var(--muted)"><span>Acesso na hora</span><span>Android e iPhone</span><span>Pix ou cartão</span></div>
+    </div>
+
+    <div class="guarantee">
+      <div class="seal"><div><span>7</span><small>dias</small></div></div>
+      <div><h3>Garantia incondicional</h3><p>Se em 7 dias você achar que não é pra você, devolvemos 100% do valor. Basta pedir.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     FAQ
+     ========================================================= -->
+<section class="band">
+  <div class="wrap stack" style="gap:24px">
+    <div class="stack">
+      <p class="eyebrow">Dúvidas</p>
+      <h2>Perguntas frequentes.</h2>
+    </div>
+    <div class="faq">
+      <details><summary>Funciona pra tigrinho, roleta e bets esportivas?</summary><p>Sim. O método trabalha a vontade de apostar, seja qual for o jogo: slots como o tigrinho, roleta, crash, cassino ao vivo ou apostas esportivas.</p></details>
+      <details><summary>Os jogos do app envolvem dinheiro?</summary><p>Não. Nenhum jogo tem aposta, compra de fichas ou prêmio em dinheiro. Você não paga nada para jogar e não tem como perder.</p></details>
+      <details><summary>Isso substitui tratamento?</summary><p>Não. O Método Desaposta é um apoio para o dia a dia e funciona bem junto com psicólogo, CAPS ou grupos como Jogadores Anônimos. Se a situação estiver pesada, procure ajuda profissional também.</p></details>
+      <details><summary>E se eu recair?</summary><p>Recaída faz parte do caminho de muita gente. Você registra no diário o que puxou o gatilho, recomeça a sequência e não perde o que já guardou no cofre.</p></details>
+      <details><summary>Como recebo o acesso?</summary><p>Logo após o pagamento, você recebe no e-mail informado na compra o link para baixar o app e seus dados de acesso.</p></details>
+      <details><summary>Como funciona a garantia?</summary><p>Você tem 7 dias para testar. Se não gostar, peça o reembolso pelo e-mail de suporte e devolvemos 100% do valor.</p></details>
+    </div>
+    <a class="btn js-cta" href="#oferta">Quero começar a desapostar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</section>
+</main>
+
+<!-- =========================================================
+     RODAPÉ
+     ========================================================= -->
+<footer class="band band--night footer">
+  <div class="wrap stack" style="gap:24px">
+    <a class="wordmark" href="#topo" style="color:var(--on-night)" aria-label="Método Desaposta"><b style="color:var(--ink)">des</b>aposta</a>
+    <div class="help">
+      <strong>Precisa conversar agora?</strong>
+      <p>Ligue para o CVV no <span class="num">188</span>. É gratuito e funciona 24 horas. Você também pode procurar o CAPS da sua cidade ou um grupo de Jogadores Anônimos.</p>
+    </div>
+    <p class="fine">O Método Desaposta é uma ferramenta de apoio e não substitui acompanhamento médico ou psicológico. Os jogos do app não envolvem dinheiro, apostas ou prêmios financeiros. Resultados variam de pessoa para pessoa.</p>
+    <div class="foot-links"><a href="#">Termos de uso</a><a href="#">Política de privacidade</a><a href="#">Suporte</a></div>
+    <p class="fine">© 2026 Método Desaposta. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<!-- Barra fixa de compra (aparece depois do primeiro botão) -->
+<div class="sticky" id="sticky" aria-hidden="true">
+  <div class="wrap">
+    <span class="sticky-price">Acesso completo<b>R$ 37</b></span>
+    <a class="btn js-cta" href="#oferta" tabindex="-1">Começar agora</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ===== CONFIGURE AQUI =====
+     Cole o link do seu checkout (Kiwify, Hotmart, Eduzz, etc.).
+     Enquanto estiver vazio, todos os botões levam até a seção de oferta. */
+  var CHECKOUT_URL = "";
+
+  if (CHECKOUT_URL) {
+    document.querySelectorAll(".js-cta").forEach(function(a){ a.href = CHECKOUT_URL; a.target = "_blank"; a.rel = "noopener"; });
+  }
+
+  /* ---- VSL ---- */
+  var v = document.getElementById("vsl-video"), um = document.getElementById("vsl-unmute"),
+      endBox = document.getElementById("vsl-end"), pauseIco = document.getElementById("vsl-pause"), bar = document.getElementById("vsl-progress");
+  function startWithSound(){ v.muted = false; v.loop = false; v.currentTime = 0; endBox.hidden = true; um.hidden = true; var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+  um.addEventListener("click", startWithSound);
+  document.getElementById("vsl-replay").addEventListener("click", startWithSound);
+  v.addEventListener("click", function(){ if (!um.hidden) return startWithSound(); if (v.paused) v.play(); else v.pause(); });
+  v.addEventListener("pause", function(){ if (um.hidden && !v.ended) pauseIco.hidden = false; });
+  v.addEventListener("play", function(){ pauseIco.hidden = true; });
+  v.addEventListener("ended", function(){ endBox.hidden = false; pauseIco.hidden = true; });
+  v.addEventListener("timeupdate", function(){ if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + "%"; });
+
+  /* ---- Calculadora ---- */
+  var brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+  var range = document.getElementById("calc-range");
+  function calc(){
+    var w = Number(range.value), year = w*52;
+    document.getElementById("calc-week").textContent = brl.format(w);
+    document.getElementById("calc-year").textContent = brl.format(year);
+    document.getElementById("calc-month").textContent = brl.format(Math.round(year/12));
+    document.getElementById("calc-5y").textContent = brl.format(year*5);
+    var m = Math.floor(year/800);
+    document.getElementById("calc-market").textContent = m === 1 ? "1 mês" : m + " meses";
+    var p = (w - range.min) / (range.max - range.min) * 100;
+    range.style.setProperty("--p", p + "%");
+  }
+  range.addEventListener("input", calc); calc();
+
+  /* ---- Recompensa de demonstração ---- */
+  var rewards = [
+    ["Sequência de 4 dias","+40 pontos de progresso"],
+    ["+R$ 60 no cofre","O que você não apostou hoje"],
+    ["Medalha nova","Mão firme: 3 noites sem abrir app de aposta"],
+    ["Combo x3","No desafio de reflexo"],
+    ["Nível 3 desbloqueado","Novos jogos liberados"],
+    ["Missão bônus","10 min de caminhada valem +20 pontos"]
+  ];
+  var btn = document.getElementById("reward"), note = document.getElementById("reward-note"), last = -1, opened = 0;
+  btn.addEventListener("click", function(){
+    var i; do { i = Math.floor(Math.random()*rewards.length); } while (i === last); last = i; opened++;
+    btn.querySelector(".r-kicker").textContent = "Você ganhou";
+    btn.querySelector(".r-main").textContent = rewards[i][0];
+    btn.querySelector(".r-sub").textContent = rewards[i][1];
+    btn.classList.add("is-open"); btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+    note.textContent = opened > 1 ? "Sentiu? Essa é a faísca, sem perder nada. Toque de novo." : "Toque de novo para abrir outra.";
+  });
+
+  /* ---- Barra fixa ---- */
+  var sticky = document.getElementById("sticky"), hero = document.getElementById("hero-cta"), offer = document.getElementById("oferta");
+  if ("IntersectionObserver" in window) {
+    var heroGone = false, offerIn = false;
+    function upd(){ var on = heroGone && !offerIn; sticky.classList.toggle("show", on); sticky.setAttribute("aria-hidden", on ? "false" : "true"); sticky.querySelector("a").tabIndex = on ? 0 : -1; }
+    new IntersectionObserver(function(e){ heroGone = !e[0].isIntersecting && e[0].boundingClientRect.top < 0; upd(); }).observe(hero);
+    new IntersectionObserver(function(e){ offerIn = e[0].isIntersecting; upd(); }, {threshold:0.15}).observe(offer);
+  }
+})();
+</script>
+</body>
+</html>
