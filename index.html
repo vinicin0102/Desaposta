@@ -216,6 +216,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 .price{display:flex;align-items:flex-end;gap:12px;padding-top:18px;border-top:1.5px dashed var(--line)}
 .price-num{font-family:var(--f-display);font-stretch:68%;font-weight:900;font-size:72px;line-height:.82;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .price-num sup{font-size:.36em;vertical-align:top;margin-right:3px;position:relative;top:.12em}
+.price-num sup.cents{font-size:.42em;margin:0 0 0 1px;letter-spacing:0}
 .price-meta{font-size:14px;color:var(--muted);line-height:1.35;padding-bottom:2px}
 .price-meta b{display:block;color:var(--ink)}
 .guarantee{display:grid;grid-template-columns:84px 1fr;gap:16px;align-items:center}
@@ -483,7 +484,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
         <li>Diário de gatilhos com seus padrões</li>
       </ul>
       <div class="price">
-        <span class="price-num"><sup>R$</sup>37</span>
+        <span class="price-num"><sup>R$</sup>27<sup class="cents">,90</sup></span>
         <span class="price-meta"><b>Pagamento único</b>Menos do que muita gente perde em 5 minutos de aposta.</span>
       </div>
       <a class="btn js-cta js-checkout" href="#oferta">Quero meu acesso <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -538,7 +539,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 <!-- Barra fixa de compra (aparece depois do primeiro botão) -->
 <div class="sticky" id="sticky" aria-hidden="true">
   <div class="wrap">
-    <span class="sticky-price">Acesso completo<b>R$ 37</b></span>
+    <span class="sticky-price">Acesso completo<b>R$ 27,90</b></span>
     <a class="btn js-cta" href="#oferta" tabindex="-1">Começar agora</a>
   </div>
 </div>
@@ -548,10 +549,16 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
   /* ===== CONFIGURE AQUI =====
      Cole o link do seu checkout (Kiwify, Hotmart, Eduzz, etc.).
      Enquanto estiver vazio, todos os botões levam até a seção de oferta. */
-  var CHECKOUT_URL = "";
+  var CHECKOUT_URL = "https://go.perfectpay.com.br/PPU38CQHMGA";
 
   if (CHECKOUT_URL) {
-    document.querySelectorAll(".js-cta").forEach(function(a){ a.href = CHECKOUT_URL; a.target = "_blank"; a.rel = "noopener"; });
+    // repassa os parâmetros do anúncio (utm_source, utm_campaign, fbclid...) para o checkout
+    var url = CHECKOUT_URL;
+    try {
+      var q = window.location.search.replace(/^\?/, "");
+      if (q) url += (url.indexOf("?") > -1 ? "&" : "?") + q;
+    } catch (e) {}
+    document.querySelectorAll(".js-cta").forEach(function(a){ a.href = url; });
   }
 
   /* ---- VSL ---- */

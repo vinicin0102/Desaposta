@@ -15,8 +15,8 @@ O site está na raiz do repositório. Para publicar, suba estes arquivos juntos,
 `src/desaposta.html` é a mesma página, sem o cabeçalho `<html>`/`<head>`, usada na prévia. Para editar, mexa nela e gere o `index.html` de novo (veja abaixo), ou edite o `index.html` direto.
 
 **Antes de rodar anúncio:**
-- Cole o link do checkout em `CHECKOUT_URL`, no `<script>` do final do `index.html`.
-- Ajuste o preço (R$ 37 é um exemplo) na seção de oferta e na barra fixa.
+- Checkout: `CHECKOUT_URL` no `<script>` do final do `index.html` (hoje aponta para a PerfectPay). Os parâmetros do anúncio (utm_*, fbclid) são repassados para o checkout.
+- Preço: R$ 27,90, na seção de oferta e na barra fixa.
 - Troque os depoimentos de exemplo (marcados "Exemplo") por depoimentos reais, com autorização.
 - Preencha os links de Termos, Privacidade e Suporte no rodapé.
 
