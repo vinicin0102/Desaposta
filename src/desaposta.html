@@ -81,6 +81,29 @@ h3{font-size:21px;font-stretch:82%;font-weight:800;line-height:1.1}
 .hero .stack{gap:22px}
 .hero-title{display:flex;flex-direction:column}
 .hero-lead{font-size:clamp(28px,8.4vw,36px);font-weight:800;line-height:1.02}
+
+/* ---------- Recompensa de R$ 50 no 7º dia ---------- */
+.r7{position:relative;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;background:var(--ink);color:var(--paper);border-radius:18px;padding:16px 16px 14px 18px;text-decoration:none;overflow:hidden;box-shadow:0 5px 0 var(--pine)}
+.r7::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(228,242,74,.16) 50%,transparent 65%);transform:translateX(-100%);animation:r7shine 4.5s 1.4s ease-in-out infinite;pointer-events:none}
+@keyframes r7shine{0%{transform:translateX(-100%)}35%,100%{transform:translateX(100%)}}
+.r7>div{min-width:0}
+.r7-k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--marker);font-weight:700}
+.r7-t{font-family:var(--f-display);font-stretch:78%;font-weight:850;font-size:21px;line-height:1.08;margin-top:4px;text-wrap:balance}
+.r7-t b{color:var(--marker);font-weight:900}
+.r7-track{display:grid;grid-template-columns:repeat(6,1fr) auto;gap:5px;align-items:center;margin-top:11px}
+.r7-track i{height:6px;border-radius:99px;background:rgba(255,255,255,.2)}
+.r7-track span{font-size:11px;font-weight:700;color:var(--marker);padding-left:2px;white-space:nowrap}
+.r7-rule{display:inline-block;margin-top:8px;font-size:12px;color:#A9B8B1;text-decoration:underline}
+.r7-coin{flex:none;width:80px;height:80px;border-radius:50%;background:var(--marker);color:var(--ink);display:grid;place-items:center;text-align:center;font-family:var(--f-display);line-height:.9;box-shadow:0 0 0 5px rgba(228,242,74,.2);transform:rotate(-8deg)}
+.r7-coin small{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-stretch:100%}
+.r7-coin b{display:block;font-stretch:66%;font-weight:900;font-size:34px;letter-spacing:-.01em}
+.r7-coin b sup{font-size:.42em;vertical-align:top;position:relative;top:.2em;margin-right:1px}
+.r7--offer{box-shadow:none;border:2px solid var(--ink)}
+.compare-row.hot .cells div:last-child{background:var(--marker)}
+.compare-row.hot .label{color:var(--ink)}
+.calc-r7{background:var(--marker);color:var(--ink);border-radius:14px;padding:12px 14px;font-size:15px;font-weight:600;line-height:1.35}
+.calc-r7 b{font-family:var(--f-display);font-stretch:75%;font-weight:900;font-size:19px}
+.feature--hot .feature-ico{background:var(--marker)}
 .edit{position:relative;display:inline-block;align-self:flex-start;margin-top:.42em;margin-left:.38em;font-size:clamp(76px,24vw,104px);font-weight:900;font-stretch:68%;line-height:.86;letter-spacing:-.02em}
 .edit-ins{position:absolute;left:-.42em;top:-.5em;font-family:var(--f-hand);font-weight:400;font-stretch:100%;font-size:.46em;line-height:1;letter-spacing:0;background:var(--marker);padding:.04em .16em .02em;border-radius:4px;transform:rotate(-7deg);white-space:nowrap;animation:write .55s .35s cubic-bezier(.3,.7,.2,1) both}
 .edit-caret{position:absolute;left:-.19em;bottom:-.04em;width:.28em;height:.22em;overflow:visible}
@@ -306,6 +329,17 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
       <span class="edit" aria-label="desaposta."><span class="edit-ins" aria-hidden="true">des</span><svg class="edit-caret" viewBox="0 0 26 20" aria-hidden="true"><path d="M2 18 L13 3 L24 18"/></svg><span aria-hidden="true">aposta.</span></span>
     </h1>
 
+    <!-- Recompensa de R$ 50 no 7º dia (regras na FAQ, #recompensa) -->
+    <a class="r7 js-r7" href="#recompensa">
+      <div>
+        <p class="r7-k">Recompensa da 1ª semana</p>
+        <p class="r7-t">Fique 7 dias sem apostar e ganhe <b>R$&nbsp;50 pra sacar na hora.</b></p>
+        <div class="r7-track" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><span>Dia 7</span></div>
+        <span class="r7-rule">Ver como funciona</span>
+      </div>
+      <span class="r7-coin" aria-hidden="true"><span><small>Dia 7</small><b><sup>R$</sup>50</b></span></span>
+    </a>
+
     <!-- =====================================================
          MINI VSL (vsl.mp4 + vsl-poster.jpg na mesma pasta desta página)
          Começa sem som e em loop; ao tocar, recomeça do início com som.
@@ -375,6 +409,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
       <div class="compare-row" role="rowgroup"><p class="label">Custo de cada rodada</p><div class="cells" role="row"><div role="cell">De R$ 1 a R$ 100 ou mais</div><div role="cell">R$ 0</div></div></div>
       <div class="compare-row" role="rowgroup"><p class="label">O que você leva</p><div class="cells" role="row"><div role="cell">Quase sempre, prejuízo</div><div role="cell">Pontos, níveis e dias limpos</div></div></div>
       <div class="compare-row" role="rowgroup"><p class="label">No fim do mês</p><div class="cells" role="row"><div role="cell">O dinheiro foi embora</div><div role="cell">O dinheiro está no seu cofre</div></div></div>
+      <div class="compare-row hot" role="rowgroup"><p class="label">No 7º dia</p><div class="cells" role="row"><div role="cell">Mais uma semana no prejuízo</div><div role="cell">R$&nbsp;50 pra sacar na hora</div></div></div>
       <div class="compare-row" role="rowgroup"><p class="label">Às 3 da manhã</p><div class="cells" role="row"><div role="cell">“Só mais uma”</div><div role="cell">Botão SOS da vontade</div></div></div>
     </div>
   </div>
@@ -401,6 +436,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
         <div class="calc-cell"><span>Em 5 anos</span><output id="calc-5y" for="calc-range">R$ 39.000</output></div>
       </div>
       <p class="muted" style="font-size:15px">Isso dá <strong id="calc-market" style="color:var(--on-pine)">9 meses</strong> de compras de mercado (R$ 800 por mês).</p>
+      <p class="calc-r7">E no 7º dia sem apostar, você ainda ganha <b>R$ 50</b> pra sacar na hora.</p>
     </div>
 
     <p class="lede">No Cofre do Desaposta, cada real que você deixa de apostar fica registrado. <span class="hl">Você vê o número subir em vez de sumir.</span></p>
@@ -445,11 +481,12 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
           </div>
           <button class="g-sound" id="g-sound" type="button" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path id="g-sound-wave" d="M16.5 8.5a5 5 0 0 1 0 7"/></svg><span>Som ligado</span></button>
         </div>
-        <p class="phone-note">No app tem mais jogos, e cada partida vira ponto, nível e medalha.</p>
+        <p class="phone-note">No app tem mais jogos, e cada partida vira ponto, nível e medalha. No 7º dia sem apostar, você desbloqueia R$ 50.</p>
       </div>
     </div>
 
     <div class="features">
+      <div class="feature feature--hot"><span class="feature-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-.8-1.5-1.2-2.5-1.2-1.4 0-2.5.8-2.5 2s1.1 1.6 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1.1 0-2.1-.5-2.6-1.3M12 6.5V8M12 16v1.5"/></svg></span><div><h3>R$ 50 no 7º dia</h3><p>Completou 7 dias seguidos sem apostar? A recompensa de R$ 50 é liberada pra você sacar na hora.</p></div></div>
       <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><div><h3>Jogos de 2 minutos</h3><p>Desafios de reflexo, quebra-cabeças e combos com recompensa surpresa. Nenhum envolve dinheiro.</p></div></div>
       <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m5.6 5.6 3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></svg></span><div><h3>Botão SOS da vontade</h3><p>Quando bater a fissura, um desafio guiado de 10 minutos ocupa sua cabeça até a onda passar.</p></div></div>
       <div class="feature"><span class="feature-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5V7M7 20v1.5M17 20v1.5"/></svg></span><div><h3>Cofre Desaposta</h3><p>Registre quanto deixou de apostar e acompanhe o total crescer, dia após dia.</p></div></div>
@@ -472,7 +509,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     <ol class="days">
       <li class="day"><span class="day-n"><small>Dia</small><span>1</span></span><div><h3>Você monta sua base</h3><p>Configura o cofre, segue o guia de bloqueio e joga a primeira partida.</p></div></li>
       <li class="day"><span class="day-n"><small>Dia</small><span>3</span></span><div><h3>A vontade aperta</h3><p>Pra muita gente, é aqui que fica difícil. O botão SOS fica a um toque.</p></div></li>
-      <li class="day"><span class="day-n"><small>Dia</small><span>7</span></span><div><h3>Primeira semana limpa</h3><p>Sua primeira medalha e o primeiro total no cofre.</p></div></li>
+      <li class="day"><span class="day-n"><small>Dia</small><span>7</span></span><div><h3>Primeira semana limpa <span class="hl">+ R$ 50</span></h3><p>Sua primeira medalha e a recompensa de R$ 50 liberada pra sacar na hora.</p></div></li>
       <li class="day"><span class="day-n"><small>Dia</small><span>14</span></span><div><h3>Você conhece seus gatilhos</h3><p>O diário mostra os horários e situações em que a vontade é mais forte.</p></div></li>
       <li class="day"><span class="day-n"><small>Dia</small><span>30</span></span><div><h3>Um mês no cofre</h3><p>Você vê, em reais, quanto ficou com você em vez de ir pra plataforma.</p></div></li>
     </ol>
@@ -515,7 +552,8 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
         <h3>App completo + programa de 30 dias</h3>
       </div>
       <ul class="checks">
-        <li>Jogos de recompensa rápida, sem dinheiro envolvido</li>
+        <li><span><strong>R$&nbsp;50 no 7º dia sem apostar</strong>, pra sacar na hora</span></li>
+        <li>Jogos de recompensa rápida, sem apostas</li>
         <li>Botão SOS para os momentos de fissura</li>
         <li>Cofre Desaposta com seu total guardado</li>
         <li>Sequência de dias, níveis e medalhas</li>
@@ -526,6 +564,14 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
         <span class="price-num"><sup>R$</sup>27<sup class="cents">,90</sup></span>
         <span class="price-meta"><b>Pagamento único</b>Menos do que muita gente perde em 5 minutos de aposta.</span>
       </div>
+      <a class="r7 r7--offer js-r7" href="#recompensa">
+        <div>
+          <p class="r7-k">Você paga R$ 27,90</p>
+          <p class="r7-t">E no 7º dia sem apostar, <b>recebe R$&nbsp;50 pra sacar na hora.</b></p>
+          <span class="r7-rule">Ver como funciona</span>
+        </div>
+        <span class="r7-coin" aria-hidden="true"><span><small>Dia 7</small><b><sup>R$</sup>50</b></span></span>
+      </a>
       <a class="btn js-cta js-checkout" href="#oferta">Quero meu acesso <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <div class="trust" style="color:var(--muted)"><span>Acesso na hora</span><span>Android e iPhone</span><span>Pix ou cartão</span></div>
     </div>
@@ -548,7 +594,9 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     </div>
     <div class="faq">
       <details><summary>Funciona pra tigrinho, roleta e bets esportivas?</summary><p>Sim. O método trabalha a vontade de apostar, seja qual for o jogo: slots como o tigrinho, roleta, crash, cassino ao vivo ou apostas esportivas.</p></details>
-      <details><summary>Os jogos do app envolvem dinheiro?</summary><p>Não. Nenhum jogo tem aposta, compra de fichas ou prêmio em dinheiro. Você não paga nada para jogar e não tem como perder.</p></details>
+      <!-- REGRAS DA RECOMPENSA: ajuste este texto para ficar igual às regras reais do programa -->
+      <details id="recompensa"><summary>Como funciona a recompensa de R$ 50?</summary><p>Fique 7 dias seguidos sem apostar, registrando seu dia no app. No 7º dia, a recompensa de R$ 50 é liberada e você pode sacar na hora.</p></details>
+      <details><summary>Os jogos do app envolvem dinheiro?</summary><p>Não. Nenhum jogo tem aposta ou compra de fichas, e você não paga nada para jogar. O único dinheiro do app é a seu favor: a recompensa de R$ 50 no 7º dia sem apostar.</p></details>
       <details><summary>Isso substitui tratamento?</summary><p>Não. O Método Desaposta é um apoio para o dia a dia e funciona bem junto com psicólogo, CAPS ou grupos como Jogadores Anônimos. Se a situação estiver pesada, procure ajuda profissional também.</p></details>
       <details><summary>E se eu recair?</summary><p>Recaída faz parte do caminho de muita gente. Você registra no diário o que puxou o gatilho, recomeça a sequência e não perde o que já guardou no cofre.</p></details>
       <details><summary>Como recebo o acesso?</summary><p>Logo após o pagamento, você recebe no e-mail informado na compra o link para baixar o app e seus dados de acesso.</p></details>
@@ -569,7 +617,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
       <strong>Precisa conversar agora?</strong>
       <p>Ligue para o CVV no <span class="num">188</span>. É gratuito e funciona 24 horas. Você também pode procurar o CAPS da sua cidade ou um grupo de Jogadores Anônimos.</p>
     </div>
-    <p class="fine">O Método Desaposta é uma ferramenta de apoio e não substitui acompanhamento médico ou psicológico. Os jogos do app não envolvem dinheiro, apostas ou prêmios financeiros. Resultados variam de pessoa para pessoa.</p>
+    <p class="fine">O Método Desaposta é uma ferramenta de apoio e não substitui acompanhamento médico ou psicológico. Os jogos do app não envolvem apostas. A recompensa de R$ 50 do 7º dia segue as regras do programa. Resultados variam de pessoa para pessoa.</p>
     <div class="foot-links"><a href="#">Termos de uso</a><a href="#">Política de privacidade</a><a href="#">Suporte</a></div>
     <p class="fine">© 2026 Método Desaposta. Todos os direitos reservados.</p>
   </div>
@@ -578,7 +626,7 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
 <!-- Barra fixa de compra (aparece depois do primeiro botão) -->
 <div class="sticky" id="sticky" aria-hidden="true">
   <div class="wrap">
-    <span class="sticky-price">Acesso completo<b>R$ 27,90</b></span>
+    <span class="sticky-price">+ R$ 50 no dia 7<b>R$ 27,90</b></span>
     <a class="btn js-cta" href="#oferta" tabindex="-1">Começar agora</a>
   </div>
 </div>
@@ -627,6 +675,11 @@ input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;bac
     range.style.setProperty("--p", p + "%");
   }
   range.addEventListener("input", calc); calc();
+
+  /* ---- Links "Ver como funciona" abrem a regra da recompensa na FAQ ---- */
+  document.querySelectorAll(".js-r7").forEach(function(a){
+    a.addEventListener("click", function(){ var d = document.getElementById("recompensa"); if (d) d.open = true; });
+  });
 
   /* ---- Jogo Reflexo ---- */
   (function(){
