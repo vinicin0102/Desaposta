@@ -54,8 +54,16 @@ html,body{background:#000;overflow:hidden}
   const T = window.OUTRO, $ = (id) => document.getElementById(id);
   const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)), seg=(t,a,b)=>clamp((t-a)/(b-a));
   const eo=x=>1-Math.pow(1-x,3), back=x=>{const c1=1.9,c3=c1+1;return x<=0?0:1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
-  const h = Number(new URLSearchParams(location.search).get("h")) || 960;
-  $("stage").style.height = h + "px";
+  const qs = new URLSearchParams(location.search);
+  const h = Number(qs.get("h")) || 960, w = Number(qs.get("w")) || 540;
+  $("stage").style.height = h + "px"; $("stage").style.width = w + "px";
+  if (w > h) { // formato deitado (4:3 / 16:9)
+    $("stage").style.gap = "16px";
+    $("wm").style.fontSize = "66px";
+    ["l1", "l2"].forEach((id) => { $(id).style.fontSize = "48px"; $(id).style.maxWidth = (w - 60) + "px"; });
+    $("l3").style.fontSize = "150px";
+    document.querySelectorAll(".ring").forEach((r) => { r.style.width = r.style.height = "640px"; r.style.margin = "-320px 0 0 -320px"; });
+  }
   if (h < 800) { document.documentElement.style.setProperty("--k", 1); $("stage").style.gap = "22px"; $("wm").style.fontSize = "74px"; $("l3").style.fontSize = "160px"; }
 
   const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';

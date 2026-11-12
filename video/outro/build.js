@@ -59,14 +59,14 @@ function audio() {
 }
 
 /* ---------- vídeo ---------- */
-async function open(browser, h) {
-  const p = await browser.newPage(); await p.setViewport({ width: 540, height: h, deviceScaleFactor: 2 });
+async function open(browser, h, w = 540) {
+  const p = await browser.newPage(); await p.setViewport({ width: w, height: h, deviceScaleFactor: 2 });
   p.on("pageerror", (e) => console.error("erro:", e.message));
-  await p.goto("file:///" + path.join(__dirname, "outro.html").replace(/\\/g, "/") + "?render=1&h=" + h, { waitUntil: "networkidle0" });
+  await p.goto("file:///" + path.join(__dirname, "outro.html").replace(/\\/g, "/") + "?render=1&h=" + h + "&w=" + w, { waitUntil: "networkidle0" });
   await p.evaluate(() => window.__ready); return p;
 }
-async function render(browser, h, wav, name) {
-  const p = await open(browser, h), stage = await p.$("#stage"), n = Math.round(T.dur * FPS);
+async function render(browser, h, wav, name, w = 540) {
+  const p = await open(browser, h, w), stage = await p.$("#stage"), n = Math.round(T.dur * FPS);
   const ff = spawn(ffmpeg, ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "png", "-i", "-", "-i", wav,
     "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", "-r", String(FPS),
     "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest", "-movflags", "+faststart", path.join(OUT, name)], { stdio: ["pipe", "inherit", "inherit"] });
@@ -80,11 +80,13 @@ async function render(browser, h, wav, name) {
   const si = process.argv.indexOf("--stills");
   if (si > -1) {
     const dir = path.join(__dirname, "stills"); fs.mkdirSync(dir, { recursive: true });
-    for (const h of [960, 675]) { const p = await open(browser, h), st = await p.$("#stage"); for (const s of process.argv[si + 1].split(",").map(Number)) { await p.evaluate((t) => window.__render(t), s); await st.screenshot({ path: path.join(dir, `h${h}-t${String(s).replace(".", "_")}.png`) }); } await p.close(); }
+    for (const [h, w] of [[960, 540], [675, 540], [540, 720]]) { const p = await open(browser, h, w), st = await p.$("#stage"); for (const s of process.argv[si + 1].split(",").map(Number)) { await p.evaluate((t) => window.__render(t), s); await st.screenshot({ path: path.join(dir, `h${h}-t${String(s).replace(".", "_")}.png`) }); } await p.close(); }
   } else {
     const wav = audio();
-    await render(browser, 960, wav, "final-7dias-stories-1080x1920.mp4");
-    await render(browser, 675, wav, "final-7dias-feed-1080x1350.mp4");
+    const only = process.argv.includes("--so-4x3");
+    if (!only) await render(browser, 960, wav, "final-7dias-stories-1080x1920.mp4");
+    if (!only) await render(browser, 675, wav, "final-7dias-feed-1080x1350.mp4");
+    await render(browser, 540, wav, "final-7dias-4x3-1440x1080.mp4", 720);
   }
   await browser.close();
   console.log("duração:", T.dur, "s");
