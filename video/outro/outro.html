@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Desaposta · final de criativo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Caveat+Brush&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+/* Final de criativo: logo + texto digitado "Fique 7 dias sem apostar e ganhe R$ 50". Tudo em função do tempo (render(t)). */
+:root{--night:#101A17;--text:#E8EEEA;--muted:#9DADA6;--marker:#E4F24A;--ink:#13201C;--line:#2E3F39;
+  --f-display:"Archivo","Arial Narrow",sans-serif;--f-body:"Instrument Sans",system-ui,sans-serif;--f-hand:"Caveat Brush",cursive}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;overflow:hidden}
+#stage{position:relative;width:540px;height:960px;overflow:hidden;color:var(--text);font-family:var(--f-body);
+  background:radial-gradient(85% 55% at 50% 48%,#22463C 0%,#152822 50%,var(--night) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:0 30px;-webkit-font-smoothing:antialiased}
+.ring{position:absolute;left:50%;top:48%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;border:2px solid var(--marker)}
+.wm{position:relative;font-family:var(--f-display);font-stretch:70%;font-weight:900;font-size:88px;line-height:1;letter-spacing:-.02em;white-space:nowrap}
+.wm b{font-family:var(--f-hand);font-weight:400;font-size:.9em;background:var(--marker);color:var(--ink);padding:0 .12em;border-radius:6px;display:inline-block;transform:rotate(-5deg);margin-right:.04em}
+.txt{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.l1,.l2{font-family:var(--f-display);font-stretch:74%;font-weight:900;font-size:56px;line-height:1.02;max-width:470px;text-wrap:balance}
+.l3{font-family:var(--f-display);font-stretch:64%;font-weight:900;font-size:190px;line-height:.88;letter-spacing:-.02em;color:var(--marker);margin-top:4px;position:relative}
+.ghost{color:transparent}
+.cur{display:inline-block;width:.09em;height:.82em;background:var(--marker);vertical-align:-.06em;margin:0 .02em;border-radius:2px}
+.l3 .cur{width:.05em}
+.glow{position:absolute;inset:-30px -60px;border-radius:50%;background:radial-gradient(closest-side,rgba(228,242,74,.38),transparent);z-index:-1;opacity:0}
+.dots{position:relative;display:flex;gap:12px;align-items:center}
+.dots i{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center}
+.dots i.on{background:var(--marker);border-color:var(--marker)}
+.dots i svg{width:20px;height:20px;fill:none;stroke:var(--ink);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.dots i.on svg{opacity:1}
+.dots i.last{width:54px;height:54px;font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:17px;color:var(--muted)}
+.dots i.last.on{color:var(--ink)}
+.sub{position:relative;font-size:21px;font-weight:600;color:#C9D6CF;text-align:center;opacity:0}
+.sub b{color:var(--marker)}
+.sp{position:absolute;left:0;top:0;width:10px;height:10px;border-radius:2px;background:var(--marker)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="ring" id="r1"></div><div class="ring" id="r2"></div>
+  <div class="wm" id="wm"><b id="wmb">des</b>aposta</div>
+  <div class="txt">
+    <p class="l1" id="l1"></p>
+    <p class="l2" id="l2"></p>
+    <p class="l3" id="l3"><span class="glow" id="glow"></span><span id="l3t"></span></p>
+  </div>
+  <div class="dots" id="dots"></div>
+  <p class="sub" id="sub">Método Desaposta · <b>toque em Saiba mais</b></p>
+  <div id="spark"></div>
+</div>
+<script src="timeline.js"></script>
+<script>
+(function(){
+  const T = window.OUTRO, $ = (id) => document.getElementById(id);
+  const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)), seg=(t,a,b)=>clamp((t-a)/(b-a));
+  const eo=x=>1-Math.pow(1-x,3), back=x=>{const c1=1.9,c3=c1+1;return x<=0?0:1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+  const h = Number(new URLSearchParams(location.search).get("h")) || 960;
+  $("stage").style.height = h + "px";
+  if (h < 800) { document.documentElement.style.setProperty("--k", 1); $("stage").style.gap = "22px"; $("wm").style.fontSize = "74px"; $("l3").style.fontSize = "160px"; }
+
+  const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+  for (let i = 0; i < 7; i++) { const d = document.createElement("i"); if (i === 6) { d.className = "last"; d.textContent = "R$50"; } else d.innerHTML = CHECK; $("dots").appendChild(d); }
+  const dots = [...$("dots").children];
+  let s = 5; const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  const sparks = Array.from({ length: 28 }, () => { const el = document.createElement("i"); el.className = "sp"; $("spark").appendChild(el); const a = rnd() * Math.PI * 2, v = 160 + rnd() * 260; return { el, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, r: rnd() * 360, s: .5 + rnd() * .8 }; });
+
+  function typed(line, t){ return T.chars.filter(c => c.line === line && c.t <= t).length; }
+  function renderLine(el, full, n, cursor){
+    const a = full.slice(0, n), b = full.slice(n);
+    el.innerHTML = esc(a) + (cursor ? '<span class="cur"></span>' : '') + '<span class="ghost">' + esc(b) + '</span>';
+  }
+  const esc = (x) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+  function render(t){
+    // anéis de fundo
+    [$("r1"), $("r2")].forEach((r, k) => { const ph = (t * .35 + k * .5) % 1; r.style.transform = "scale(" + (.3 + ph * 1.5) + ")"; r.style.opacity = (1 - ph) * .14 * seg(t, 0, .6); });
+    // logo
+    const lp = eo(seg(t, T.logo, T.logo + .45)); $("wm").style.opacity = lp; $("wm").style.transform = "translateY(" + (1 - lp) * 24 + "px) scale(" + (.9 + .1 * lp) + ")";
+    $("wmb").style.clipPath = "inset(0 " + (100 - 100 * eo(seg(t, T.write, T.write + .4))) + "% 0 0)";
+    // digitação
+    const n1 = typed(1, t), n2 = typed(2, t), n3 = typed(3, t);
+    const next = T.chars.find(c => c.t > t), active = next ? next.line : 3;
+    const blink = Math.floor(t / .45) % 2 === 0;
+    const showCur = t > .8 && t < T.pop + .6 && ((next && next.t - t < .25) || blink);
+    renderLine($("l1"), T.L1, n1, showCur && active === 1);
+    renderLine($("l2"), T.L2, n2, showCur && active === 2);
+    renderLine($("l3t"), T.L3, n3, showCur && active === 3);
+    $("l2").style.visibility = n2 || active >= 2 ? "visible" : "hidden";
+    $("l3").style.visibility = n3 || active >= 3 ? "visible" : "hidden";
+    // R$ 50 explode
+    const pp = seg(t, T.pop, T.pop + .45); const sc = t < T.pop ? 1 : (pp < 1 ? 1 + .16 * Math.sin(Math.PI * pp) : 1);
+    $("l3").style.transform = "scale(" + sc + ")";
+    $("glow").style.opacity = t < T.pop ? 0 : (pp < 1 ? .4 * pp + .6 * Math.sin(Math.PI * pp) : .4 + .08 * Math.sin((t - T.pop) * 4));
+    const c = $("l3").getBoundingClientRect(), st = $("stage").getBoundingClientRect(), cx = c.left - st.left + c.width / 2, cy = c.top - st.top + c.height / 2;
+    sparks.forEach(o => { const dt = t - T.pop; if (dt < 0 || dt > 1.2) { o.el.style.visibility = "hidden"; return; } o.el.style.visibility = "visible"; o.el.style.opacity = 1 - dt / 1.2; o.el.style.transform = "translate(" + (cx + o.vx * dt) + "px," + (cy + o.vy * dt + 260 * dt * dt) + "px) rotate(" + (o.r + 300 * dt) + "deg) scale(" + o.s + ")"; });
+    // 7 dias
+    const dp = eo(seg(t, T.dots[0] - .25, T.dots[0])); $("dots").style.opacity = dp; $("dots").style.transform = "translateY(" + (1 - dp) * 16 + "px)";
+    dots.forEach((d, i) => { const on = t >= T.dots[i]; d.classList.toggle("on", on); d.style.transform = "scale(" + (on ? back(seg(t, T.dots[i], T.dots[i] + .2)) * (i === 6 ? 1 + .06 * Math.sin((t - T.dots[i]) * 6) * (t > T.dots[i] + .2 ? 1 : 0) : 1) : 1) + ")"; });
+    const sp = eo(seg(t, T.sub, T.sub + .4)); $("sub").style.opacity = sp; $("sub").style.transform = "translateY(" + (1 - sp) * 12 + "px)";
+  }
+  window.__DUR = T.dur; window.__render = render;
+  window.__ready = (async () => { await Promise.all([document.fonts.load('900 40px "Archivo"'), document.fonts.load('400 40px "Caveat Brush"'), document.fonts.load('600 16px "Instrument Sans"')]); await document.fonts.ready; render(0); return true; })();
+  if (!/render=1/.test(location.search)) window.__ready.then(() => { const st = performance.now(); (function loop(){ render(((performance.now() - st) / 1000) % (T.dur + .8)); requestAnimationFrame(loop); })(); });
+})();
+</script>
+</body>
+</html>
