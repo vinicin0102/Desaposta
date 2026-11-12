@@ -46,8 +46,12 @@
       vo: [{ t: 0.15, text: "Um dia de cada vez, você retoma o controle." }],
       ev: { fill: [0.3, 1.5], medal: [1.9] } },
 
+    { id: "bonus", min: 6.4,
+      vo: [{ t: 0.2, text: "E tem mais: para os 100 primeiros que entrarem, completar 7 dias sem apostar libera uma recompensa de R$ 50 pra sacar na hora." }],
+      ev: { card: [0.1], coin: [0.55], tag: [1.4] } },
+
     { id: "cta", min: 6.2,
-      vo: [{ t: 0.2, text: "Método Desaposta. A mesma faísca, sem a perda. Toque no botão e comece hoje." }],
+      vo: [{ t: 0.2, text: "Método Desaposta. A mesma faísca, sem a perda. Toque no botão e garanta sua vaga entre os 100 primeiros." }],
       ev: { logo: [0.1], tag: [0.7], card: [1.15], tap: [4.9] } },
   ];
 

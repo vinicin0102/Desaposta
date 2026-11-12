@@ -203,6 +203,8 @@ const peak = (x) => x.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
   addAt(fx, bell(N(91), 1.2, 0.4, 0.35), at("vault", "count", 1)); addAt(fx, scribble(0.5), at("vault", "keep"), 0.4);
   for (let k = 0; k < 12; k++) addAt(fx, tick(1800 * Math.pow(1.06, k), 0.2), at("progress", "fill", 0) + (k * (S.progress.ev.fill[1] - S.progress.ev.fill[0])) / 11);
   addAt(fx, chime([84, 88, 91], 0.0, 0.3, 0.7), at("progress", "medal")); addAt(fx, sparkle(0.6, 10), at("progress", "medal"));
+  addAt(fx, impact(0.5), at("bonus", "coin")); addAt(fx, chime([72, 76, 79, 84, 88], 0.07, 0.5), at("bonus", "coin") + 0.05); addAt(fx, sparkle(0.9, 18), at("bonus", "coin") + 0.1);
+  addAt(fx, impact(0.75), at("bonus", "tag")); addAt(fx, tap(), at("bonus", "tag"), 0.8);
   addAt(fx, whoosh(0.45, 0.7), at("cta", "card") - 0.1); addAt(fx, impact(0.4), at("cta", "tag"));
   addAt(fx, tap(), at("cta", "tap")); addAt(fx, chime([72, 79, 84], 0.06, 0.45), at("cta", "tap") + 0.05);
 

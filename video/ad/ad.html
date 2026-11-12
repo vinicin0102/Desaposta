@@ -180,6 +180,19 @@ body{display:grid;place-items:center;min-height:100vh}
 .medal .m svg{width:30px;height:30px;fill:var(--ink)}
 .medal b{font-family:var(--f-display);font-stretch:78%;font-weight:900;font-size:26px;line-height:1.05;display:block}
 
+/* BONUS */
+#s-bonus{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;background:radial-gradient(90% 60% at 50% 50%,#22463C,var(--night))}
+.bn-k{font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--marker);font-weight:700}
+.bn-h{font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:64px;line-height:.95;margin-top:10px}
+.bn-coin{position:relative;width:300px;height:300px;border-radius:50%;background:var(--marker);display:grid;place-items:center;box-shadow:0 0 0 14px rgba(228,242,74,.12),0 0 0 30px rgba(228,242,74,.05),0 40px 90px -20px rgba(228,242,74,.55)}
+.bn-coin::before{content:"";position:absolute;inset:20px;border-radius:50%;border:4px dashed rgba(19,32,28,.45)}
+.bn-coin .v{font-family:var(--f-display);font-stretch:64%;font-weight:900;color:var(--ink);font-size:170px;line-height:.8;letter-spacing:-.03em;display:flex;align-items:flex-start;transform:translateY(-14px)}
+.bn-coin .v sup{font-size:52px;margin-top:12px;margin-right:4px}
+.bn-rib{position:absolute;left:-34px;right:-34px;bottom:46px;background:var(--ink);color:var(--marker);font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:24px;letter-spacing:.04em;padding:9px 0;border-radius:6px;transform:rotate(-4deg)}
+.bn-tag{display:inline-flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:12px 22px;font-family:var(--f-display);font-stretch:80%;font-weight:900;font-size:32px;box-shadow:0 6px 0 var(--marker);opacity:0}
+.bn-tag svg{width:30px;height:30px;fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.bn-fine{font-size:13px;color:var(--muted)}
+
 /* CTA */
 #s-cta{display:none;flex-direction:column;align-items:center;text-align:center;background:radial-gradient(100% 60% at 50% 30%,#1A2E28,var(--night))}
 #s-cta .wm{font-size:86px;margin-top:96px}
@@ -319,7 +332,15 @@ body{display:grid;place-items:center;min-height:100vh}
     <div class="medal" id="medal"><span class="m"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg></span><div><span class="label" style="color:var(--ink);opacity:.6">Próxima medalha</span><b>Semana limpa · em 2 dias</b></div></div>
   </section>
 
-  <!-- 9. CTA -->
+  <!-- 9. BÔNUS -->
+  <section class="scene" id="s-bonus">
+    <div id="bn-head"><p class="bn-k">Bônus de lançamento</p><p class="bn-h">Dia 7 sem apostar</p></div>
+    <div class="bn-coin" id="bn-coin"><div class="v"><sup>R$</sup>50</div><div class="bn-rib">PRA SACAR NA HORA</div></div>
+    <div class="bn-tag" id="bn-tag"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.8.8 2.8 2.5 3 5.2"/></svg>Só para os 100 primeiros</div>
+    <p class="bn-fine" id="bn-fine">Recompensa conforme as regras do programa.</p>
+  </section>
+
+  <!-- 10. CTA -->
   <section class="scene" id="s-cta">
     <div class="wm" id="cwm"><b id="cwmb">des</b>aposta</div>
     <p class="cta-tag" id="ctag">A mesma faísca.<br><span>Sem a perda.</span></p>
@@ -327,6 +348,7 @@ body{display:grid;place-items:center;min-height:100vh}
       <li>Jogos rápidos, sem dinheiro envolvido</li>
       <li>Botão SOS pra hora da vontade</li>
       <li>Cofre e progresso todo dia</li>
+      <li>R$ 50 no 7º dia (100 primeiros)</li>
       <li>Garantia de 7 dias</li>
       <div class="btn" id="cbtn">Começar agora →</div>
     </div>
@@ -355,7 +377,7 @@ const brl=n=>"R$ "+Math.round(n).toLocaleString("pt-BR");
 const S = Object.fromEntries(TL.scenes.map(s=>[s.id,s]));
 const A = (id,key,k=0)=>S[id].start+S[id].ev[key][k];
 const SHOW_CAPTIONS = /captions=1/.test(location.search) || !/render=1/.test(location.search);
-const NO_CAP_SCENES = ["mech","brand","cta"];
+const NO_CAP_SCENES = ["mech","brand","bonus","cta"];
 
 /* barra de status nas telas do app */
 const SB = '<span class="clk">23:47</span><span class="icons"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 28 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.5" fill="none" stroke="#E8EEEA" opacity=".5"/><rect x="2.5" y="2.5" width="13" height="8" rx="2"/><rect x="25" y="4" width="2" height="5" rx="1" opacity=".5"/></svg></span>';
@@ -365,7 +387,7 @@ document.querySelector("#s-lock .sb .clk").textContent="";
 function scene(id,t){
   const s=S[id], el=$("s-"+id), a=s.start-.2, b=s.start+s.dur+.2;
   if(t<a||t>b){el.style.display="none";return null}
-  el.style.display=(id==="brand"||id==="cta")?"flex":"block";
+  el.style.display=(id==="brand"||id==="cta"||id==="bonus")?"flex":"block";
   const d=.4, i=eo(seg(t,a,a+d)), o=(b>DUR)?1:1-eio(seg(t,b-d,b));
   el.style.opacity=Math.min(i,o);
   el.style.transform="translateX("+((1-i)*50-(1-o)*50)+"px)";
@@ -587,6 +609,16 @@ function render(t){
     });
     const rp=(lt*1.2)%1; ring.style.opacity=lt>e.fill[1]?1-rp*.8:0; ring.style.transform="scale("+(1+rp*.18)+")";
     const m=seg(lt,e.medal[0],e.medal[0]+.4); $("medal").style.opacity=m; $("medal").style.transform="translateY("+(1-back(m))*60+"px)";
+  }
+
+  if((lt=scene("bonus",t))!==null){
+    const e=S.bonus.ev;
+    const h=eo(seg(lt,e.card[0],e.card[0]+.45)); $("bn-head").style.opacity=h; $("bn-head").style.transform="translateY("+(1-h)*24+"px)";
+    const c=seg(lt,e.coin[0],e.coin[0]+.5); $("bn-coin").style.opacity=c>0?1:0;
+    $("bn-coin").style.transform="rotate("+(-6+ (1-eo(c))*-30)+"deg) scale("+(c>0?back(c):0)*(1+.025*Math.sin((lt-e.coin[0])*3))+")";
+    const g=seg(lt,e.tag[0],e.tag[0]+.28); $("bn-tag").style.opacity=g>0?1:0;
+    $("bn-tag").style.transform="rotate(-2deg) scale("+(g>0?1.7-.7*eo(g):1)+")";
+    $("bn-fine").style.opacity=seg(lt,e.tag[0]+.3,e.tag[0]+.7);
   }
 
   if((lt=scene("cta",t))!==null){
